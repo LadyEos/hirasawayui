@@ -1,0 +1,6 @@
+Zend Framework 2 Modules for project codename hirasawayui
+Needed:
+doctrine 2
+zfcbase
+zfcuser
+zfc-twitter-bootstrap
