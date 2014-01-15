@@ -1,0 +1,6 @@
+<?php
+$title = 'Users homepage';
+$this->headTitle($title);
+?>
+<h1><?php echo $this->escapeHtml($title); ?></h1>
+<p>Add <a href="<?php echo $this->url('zfcuser/addprofile') ?>"><?php echo $this->translate('Profile') ?></a></p>

@@ -1,0 +1,23 @@
+<?php
+$title = 'Welcome Back';
+$this->headTitle($title);
+?>
+<h1><?php echo $this->escapeHtml($title); ?></h1>
+<?php
+$form->setAttribute('action', $this->url('oldish', array(
+    'action' => 'login'
+)));
+$form->prepare();
+
+echo $this->form()->openTag($form);
+echo $this->formRow($form->get('username'));
+echo $this->formRow($form->get('password'));
+echo $this->formRow($form->get('rememberme'));
+echo $this->formSubmit($form->get('submit'));
+?>
+<br>
+
+<?php
+echo $this->form()->closeTag();
+
+

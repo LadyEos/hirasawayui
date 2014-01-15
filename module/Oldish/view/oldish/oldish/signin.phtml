@@ -1,0 +1,22 @@
+<?php
+ // module/Album/view/album/album/add.phtml:
+
+ $title = 'New User Registration';
+ $this->headTitle($title);
+ ?>
+ <h1><?php echo $this->escapeHtml($title); ?></h1>
+ <?php
+ $form->setAttribute('action', $this->url('oldish', array('action' => 'signin')));
+ $form->prepare();
+ 
+ echo $this->form()->openTag($form);
+echo $this->ztbFormElement($form->get('username'));
+
+echo $this->ztbFormElement($form->get('password'));
+
+echo $this->ztbFormElement($form->get('password_validation'));
+
+echo $this->ztbFormElement($form->get('email'));
+
+echo $this->formSubmit($form->get('submit'));
+ echo $this->form()->closeTag();

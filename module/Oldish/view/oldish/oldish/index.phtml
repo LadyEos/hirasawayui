@@ -1,0 +1,48 @@
+<?php
+$title = 'Users';
+$this->headTitle($title);
+?>
+<h1><?php echo $this->escapeHtml($title); ?></h1>
+<p>
+	<a href="<?php echo $this->url('oldish', array('action'=>'signin'));?>">Sign In</a>
+</p>
+<p>
+	<a href="<?php echo $this->url('oldish', array('action'=>'login'));?>">Login</a>
+</p>
+
+<?php 
+if ($user = $this->identity()) {
+        echo 'Logged in as ' . $this->escapeHtml($user->getUsername());
+    } else {
+        echo 'Not logged in';
+    }
+?>
+<table class="table">
+	<tr>
+		<th>username</th>
+		<th>email</th>
+		<th>&nbsp;</th>
+	</tr>
+ <?php foreach ($users as $user) : ?>
+ <tr>
+		<td><?php echo $this->escapeHtml($user->getUsername());?></td>
+		<td><?php echo $this->escapeHtml($user->getEmail());?></td>
+		<td><a
+			href="<?php
+    
+echo $this->url('oldish', array(
+        'action' => 'edit',
+        'id' => $user->getId()
+    ));
+    ?>">Edit</a> <a
+			href="<?php
+    
+echo $this->url('oldish', array(
+        'action' => 'delete',
+        'id' => $user->getId()
+    ));
+    ?>">Delete</a>
+		</td>
+	</tr>
+ <?php endforeach; ?>
+ </table>
