@@ -57,9 +57,17 @@ echo $this->headScript()
 				<ul class="nav navbar-nav">
 					<!-- <li class="active"><a href="<?php echo $this->url('home') ?>"><?php echo $this->translate('Home') ?></a></li>-->
 					<li><a href="<?php echo $this->url('home') ?>"><?php echo $this->translate('Home') ?></a></li>
-					<li><a href="<?php echo $this->url('zfcuser/login') ?>"><?php echo $this->translate('Login') ?></a></li>
+					<!-- Test if the User is connected -->
+                    <?php if(!$this->zfcUserIdentity()): ?>
+                    <!-- display the login form -->
+                    <?php //echo $this->zfcUserLoginWidget(array('redirect'=>'application')); ?>
+                    <li><a href="<?php echo $this->url('zfcuser/login') ?>"><?php echo $this->translate('Login') ?></a></li>
 					<li><a href="<?php echo $this->url('zfcuser/register')?>"><?php echo $this->translate('Register') ?></a></li>
+                    <?php else: ?>
+                    <!-- display the 'display name' of the user -->
+					<li><a href="<?php echo $this->url('zfcuser/home') ?>"><?php echo $this->zfcUserIdentity()->getUsername(); ?></a></li>
 					<li><a href="<?php echo $this->url('zfcuser/logout') ?>"><?php echo $this->translate('Logout') ?></a></li>
+                    <?php endif?>
 					
 				</ul>
 			</div>

@@ -61,6 +61,21 @@ class UserProfiles
      * @ORM\JoinColumn(name="country_id", referencedColumnName="id")
      */
     protected $countries;
+
+    /**
+     * @ORM\OneToOne(targetEntity="Users", mappedBy="user_profile")
+     */
+    private $user;
+
+    /**
+     * @ORM\Column(type="string", length=128, nullable=TRUE)
+     */
+    protected $displayname;
+    
+    /**
+     * @ORM\Column(type="string", length=1, nullable=TRUE)
+     */
+    protected $gender;
     
     // getters/setters
     public function getId()
@@ -75,7 +90,7 @@ class UserProfiles
 
     public function setFirst_name($first_name)
     {
-        $this->first_name = $first_namee;
+        $this->first_name = $first_name;
     }
 
     public function getLast_name()
@@ -148,6 +163,26 @@ class UserProfiles
         $this->webpage = $webpage;
     }
 
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    public function setUser($user)
+    {
+        $this->user = $user;
+    }
+    
+    public function getGender()
+    {
+    	return $this->gender;
+    }
+    
+    public function setGender($gender)
+    {
+    	$this->gender = $gender;
+    }
+
     /**
      * Populate from an array.
      *
@@ -155,11 +190,11 @@ class UserProfiles
      */
     public function populate($data = array())
     {
-        if (array_key_exists('firstname', $data) && $data['firstname'] != '')
-            $this->first_name = $data['firstname'];
+        if (array_key_exists('first_name', $data))
+            $this->first_name = $data['first_name'];
         
-        if (array_key_exists('lastname', $data))
-            $this->last_name = $data['lastname'];
+        if (array_key_exists('last_name', $data))
+            $this->last_name = $data['last_name'];
         
         if (array_key_exists('birthdate', $data))
             $this->birthdate = $data['birthdate'];
@@ -178,5 +213,43 @@ class UserProfiles
         
         if (array_key_exists('webpage', $data))
             $this->webpage = $data['webpage'];
+        
+        if (array_key_exists('displayname', $data))
+        	$this->displayname = $data['displayname'];
+        
+        if (array_key_exists('gender', $data))
+        	$this->gender = $data['gender'];
+        
+        return $data;
+    }
+
+    public function getArrayCopy()
+    {
+        /*return array(
+            'id' => $this->id,
+            'first_name' => $this->first_name,
+            'last_name' => $this->last_name,
+            'birthdate' => $this->birthdate,
+            'biography' => $this->biography,
+            'profile_picture_url' => $this->profile_picture_url,
+            'facebook_link' => $this->facebook_link,
+            'twitter_link' => $this->twitter_link,
+            'webpage' => $this->webpage,
+            'countries' => $this->countries,
+            'displayname' => $this->displayname
+        // 'user'=>$this->user
+                );*/
+        $data = get_object_vars($this);
+        return $data;
+    }
+
+    public function getDisplayName()
+    {
+        return $this->displayname;
+    }
+
+    public function setDisplayName($displayName)
+    {
+        $this->displayname = $displayName;
     }
 }

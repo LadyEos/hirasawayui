@@ -99,7 +99,7 @@ class Users implements User {
     protected $recipients;
     
     /**
-     * @ORM\OneToOne(targetEntity="UserProfiles")
+     * @ORM\OneToOne(targetEntity="UserProfiles", inversedBy="user")
      * @ORM\JoinColumn(name="user_profile_id", referencedColumnName="id")
      */
     protected $user_profile;
@@ -306,5 +306,6 @@ class Users implements User {
     public function setUserProfile($userprofile){
     	$this->user_profile = $userprofile;
     }
+    
 
 }

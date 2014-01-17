@@ -3,6 +3,7 @@ namespace Users\Form;
 
 use Zend\InputFilter\Factory as InputFactory;
 use Zend\InputFilter\InputFilter;
+use Zend\InputFilter\InputFilterProviderInterface;
 
 class ProfileFilter extends InputFilter
 {
@@ -34,7 +35,7 @@ class ProfileFilter extends InputFilter
         ));
         
         $this->add(array(
-            'name' => 'firstname',
+            'name' => 'first_name',
             'required' => false,
             'filters' => array(
                 array(
@@ -57,7 +58,7 @@ class ProfileFilter extends InputFilter
         ));
         
         $this->add(array(
-            'name' => 'lastname',
+            'name' => 'last_name',
             'required' => false,
             'filters' => array(
                 array(

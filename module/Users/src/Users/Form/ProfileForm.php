@@ -5,12 +5,11 @@ use Zend\Form\Form;
 
 class ProfileForm extends Form
 {
-    
+
     public function __construct($name = null)
     {
         // we want to ignore the name passed
         parent::__construct('profile');
-        $this->setAttribute('method', 'post');
         
         $this->add(array(
             'name' => 'displayname', // 'usr_name',
@@ -22,7 +21,7 @@ class ProfileForm extends Form
             )
         ));
         $this->add(array(
-            'name' => 'firstname', // 'usr_name',
+            'name' => 'first_name', // 'usr_name',
             'attributes' => array(
                 'type' => 'text'
             ),
@@ -31,7 +30,7 @@ class ProfileForm extends Form
             )
         ));
         $this->add(array(
-            'name' => 'lastname', // 'usr_name',
+            'name' => 'last_name', // 'usr_name',
             'attributes' => array(
                 'type' => 'text'
             ),
@@ -43,16 +42,29 @@ class ProfileForm extends Form
             'name' => 'birthdate', // 'usr_name',
             'type' => 'Date',
             'attributes' => array(
-            	'id' => 'birthdate'
+                'id' => 'birthdate'
             ),
             'options' => array(
                 'label' => 'Birthdate'
             ),
             'attributes' => array(
                 'min' => '1950-01-01',
-                'max' => date('Y-m-d',mktime(0, 0, 0, date("m"), date("d"),   date("Y")-12)),
+                'max' => date('Y-m-d', mktime(0, 0, 0, date("m"), date("d"), date("Y") - 12)),
                 'step' => '1' // days; default step interval is 1 day
-             )
+                        )
+        ));
+        $this->add(array(
+            'type' => 'Select',
+            'name' => 'gender',
+            'options' => array(
+                'label' => 'Gender',
+                'empty_option' => 'Please choose your gender',
+                'value_options' => array(
+                    'F' => 'Female',
+                    'M' => 'Male',
+                    'O' => 'Other'
+                )
+            )
         ));
         $this->add(array(
             'name' => 'biography', // 'usr_name',
@@ -73,23 +85,24 @@ class ProfileForm extends Form
             )
         ));
         $this->add(array(
-        		'name' => 'twitter_link', // 'usr_name',
-        		'attributes' => array(
-        				'type' => 'text'
-        		),
-        		'options' => array(
-        				'label' => 'Twitter username'
-        		)
+            'name' => 'twitter_link', // 'usr_name',
+            'attributes' => array(
+                'type' => 'text'
+            ),
+            'options' => array(
+                'label' => 'Twitter username'
+            )
         ));
         $this->add(array(
-        		'name' => 'webpage', // 'usr_name',
-        		'attributes' => array(
-        				'type' => 'text'
-        		),
-        		'options' => array(
-        				'label' => 'Webpage'
-        		)
+            'name' => 'webpage', // 'usr_name',
+            'attributes' => array(
+                'type' => 'text'
+            ),
+            'options' => array(
+                'label' => 'Webpage'
+            )
         ));
+
         $this->add(array(
             'name' => 'submit',
             'attributes' => array(

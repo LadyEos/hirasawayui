@@ -7,10 +7,7 @@ use Zend\ModuleManager\Feature\BootstrapListenerInterface;
 use Zend\EventManager\EventInterface;
 use Zend\Mvc\MvcEvent;
 
-class Module implements
-    AutoloaderProviderInterface,
-    ConfigProviderInterface,
-    BootstrapListenerInterface
+class Module implements AutoloaderProviderInterface, ConfigProviderInterface, BootstrapListenerInterface
 {
 
     public function getAutoloaderConfig()
@@ -35,23 +32,31 @@ class Module implements
     public function getServiceConfig()
     {
         return array(
-            
-        );
-    }
-    
-    public function onBootstrap(EventInterface $e)
-    {
-    	$application   = $e->getApplication();
-    	$sm = $application->getServiceManager();
-    	$sharedManager = $application->getEventManager()->getSharedManager();
-    	 
-    	$sharedManager->attach('Zend\Mvc\Application', 'dispatch.error',
-    			function($e) use ($sm) {
-    				if ($e->getParam('exception')){
-    					$sm->get('Zend\Log')->crit($e->getParam('exception'));
-    				}
-    			}
-    	);
+            'factories' => array(
+                /* 'doctrineTest' => function ($sm)
+                {
+                    $doctrineTest = $sm->get('\Doctrine\ORM\Tools\SchemaTool');
+                    
+
+                    return $doctrineTest;
+                } */
+            )
+        )
+        ;
     }
 
+    public function onBootstrap(EventInterface $e)
+    {
+        $application = $e->getApplication();
+        $sm = $application->getServiceManager();
+        $sharedManager = $application->getEventManager()->getSharedManager();
+        
+        $sharedManager->attach('Zend\Mvc\Application', 'dispatch.error', function ($e) use($sm)
+        {
+            if ($e->getParam('exception')) {
+                $sm->get('Zend\Log')
+                    ->crit($e->getParam('exception'));
+            }
+        });
+    }
 }

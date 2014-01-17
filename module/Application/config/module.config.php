@@ -24,7 +24,18 @@ return array(
                         'controller' => 'Application\Controller\Index',
                         'action' => 'index'
                     )
-                )
+                ),
+                
+            ),
+            'test' => array(
+            		'type' => 'Zend\Mvc\Router\Http\Literal',
+            		'options' => array(
+            				'route' => '/app/test',
+            				'defaults' => array(
+            						'controller' => 'Application\Controller\Index',
+            						'action' => 'testdoctrine'
+            				)
+            		)
             ),
             // The following is a route to simplify getting started creating
             // new controllers and actions without needing to create a new
@@ -102,6 +113,7 @@ return array(
         /**
          * 'driver' => array(
          * __NAMESPACE__ .
+         *
          * '_driver' => array(
          * 'class' => 'Doctrine\ORM\Mapping\Driver\AnnotationDriver',
          * 'cache' => 'array',
@@ -140,9 +152,11 @@ return array(
         )
     ),
     'zfcuser' => array(
-    		// telling ZfcUser to use our own class
-    		'user_entity_class'       => 'Application\Entity\Users',
-    		// telling ZfcUserDoctrineORM to skip the entities it defines
-    		'enable_default_entities' => false,
-    ),
+        // telling ZfcUser to use our own class
+        'user_entity_class' => 'Application\Entity\Users',
+        // telling ZfcUserDoctrineORM to skip the entities it defines
+        'enable_default_entities' => false
+    )
 );
+
+

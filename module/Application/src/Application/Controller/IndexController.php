@@ -12,26 +12,66 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Doctrine\ORM\EntityManager;
 use Application\Entity\Users;
-//use AuthDoctrine\Form\LoginForm;       // <-- Add this import
-//use AuthDoctrine\Form\LoginFilter;
+use Zend\ServiceManager;
+use Doctrine\ORM\Tools\SchemaTool;
 
 class IndexController extends AbstractActionController
 {
 
+    protected $doctrineTest;
+
+    protected $oMService;
+
     public function indexAction()
     {
-        /* $objectManager = $this->getServiceLocator()->get('Doctrine\ORM\EntityManager');
-        
-        $user = new \Application\Entity\Users();
-        $user->setUsername('MarcoPivetta');
-        $user->setPassword('MarcoPivetta');
-        $user->setEmail('MarcoPivetta@mail.com');
-        
-        $objectManager->persist($user);
-        $objectManager->flush();
-        
-        die(var_dump($user->getId())); */
-        
+        /*
+         * $objectManager = $this->getServiceLocator()->get('Doctrine\ORM\EntityManager'); $user = new \Application\Entity\Users(); $user->setUsername('MarcoPivetta'); $user->setPassword('MarcoPivetta'); $user->setEmail('MarcoPivetta@mail.com'); $objectManager->persist($user); $objectManager->flush(); die(var_dump($user->getId()));
+         */
         return new ViewModel();
+    }
+
+    public function testdoctrineAction()
+    {
+        $em = $this->getOMService()->getEntityManager();
+        $tool = new \Doctrine\ORM\Tools\SchemaTool($em);
+        $classes = array(
+        		$em->getClassMetadata('Application\Entity\Users'),
+        		$em->getClassMetadata('Application\Entity\Albums'),
+            $em->getClassMetadata('Application\Entity\Countries'),
+            $em->getClassMetadata('Application\Entity\Genres'),
+            $em->getClassMetadata('Application\Entity\GroupChatMessages'),
+            $em->getClassMetadata('Application\Entity\GroupChats'),
+            $em->getClassMetadata('Application\Entity\Likes'),
+            $em->getClassMetadata('Application\Entity\Payments'),
+            $em->getClassMetadata('Application\Entity\PrivateMessages'),
+            $em->getClassMetadata('Application\Entity\ProfileTypes'),
+            $em->getClassMetadata('Application\Entity\SoldSongs'),
+            $em->getClassMetadata('Application\Entity\SongCategories'),
+            $em->getClassMetadata('Application\Entity\Songs'),
+            $em->getClassMetadata('Application\Entity\SongsVersionHistory'),
+            $em->getClassMetadata('Application\Entity\UserProfiles'),
+            
+        );
+        $errors = $tool->createSchema($classes);
+        
+        print_r($errors);
+    }
+
+   /*  public function getDoctrineTest()
+    {
+        if (! $this->doctrineTest) {
+            $sm = $this->getServiceLocator();
+            $this->doctrineTest = $sm->get('doctrineTest');
+        }
+        return $this->doctrineTest;
+    } */
+
+    private function getOMService()
+    {
+        if (! $this->oMService) {
+            $this->oMService = $this->getServiceLocator()->get('Application\Service\DoctrineOMService');
+        }
+        
+        return $this->oMService;
     }
 }

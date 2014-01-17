@@ -1,6 +1,28 @@
 <?php
 $title = 'Users homepage';
 $this->headTitle($title);
+$user = $this->zfcUserIdentity()->getId();
 ?>
-<h1><?php echo $this->escapeHtml($title); ?></h1>
-<p>Add <a href="<?php echo $this->url('zfcuser/addprofile') ?>"><?php echo $this->translate('Profile') ?></a></p>
+
+
+<div class="page-header">
+    <h1><?php echo $this->translate('User details'); ?></h1>
+</div>
+<div class="container">
+<div class="row">
+<div style="float:left; padding-right:16px;"><?php echo $this->gravatar($this->zfcUserIdentity()->getEmail()) ?></div>
+<h3><?php echo $this->translate('Hello'); ?>, <?php 
+if($this->zfcUserDisplayName()!='')
+echo $this->zfcUserDisplayName();
+else
+    $this->zfcUserUsername();
+
+?>!</h3>
+<p>
+	Add <a href="<?php echo $this->url('zfcuser/addprofile') ?>"><?php echo $this->translate('Profile') ?></a>
+	Edit <a href="<?php echo $this->url('zfcuser/editprofile');?>">Profile</a>
+</p>
+<a href="<?php echo $this->url('zfcuser/logout') ?>">[<?php echo $this->translate('Sign Out'); ?>]</a>
+</div>
+</div>
+

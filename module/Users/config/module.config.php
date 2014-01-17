@@ -8,10 +8,10 @@ return array(
     
     'router' => array(
         'routes' => array(
-            'users' => array(
+            'zfcuser' => array(
                 'type' => 'segment',
                 'options' => array(
-                    'route' => '/users[/][:action][/:id]',
+                    'route' => '/user[/][:action][/:id]',
                     'constraints' => array(
                         'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
                         'id' => '[0-9]+'
@@ -20,7 +20,7 @@ return array(
                         'controller' => 'Users\Controller\Users',
                         'action' => 'index'
                     )
-                ),
+                )
             ),
             'zfcuser' => array(
                 'child_routes' => array(
@@ -30,7 +30,17 @@ return array(
                             'route' => '/addprofile',
                             'defaults' => array(
                                 'controller' => 'Users\Controller\Users',
-                                'action' => 'addProfile'
+                                'action' => 'addprofile'
+                            )
+                        )
+                    ),
+                    'editprofile' => array(
+                        'type' => 'Literal',
+                        'options' => array(
+                            'route' => '/editprofile',
+                            'defaults' => array(
+                                'controller' => 'Users\Controller\Users',
+                                'action' => 'editprofile'
                             )
                         )
                     ),
