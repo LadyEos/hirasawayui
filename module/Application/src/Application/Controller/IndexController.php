@@ -52,7 +52,8 @@ class IndexController extends AbstractActionController
             $em->getClassMetadata('Application\Entity\UserProfiles'),
             
         );
-        $errors = $tool->createSchema($classes);
+        //$errors = $tool->createSchema($classes);
+        $errors = $tool->updateSchema($classes);
         
         print_r($errors);
     }

@@ -20,7 +20,11 @@ else
 ?>!</h3>
 <p>
 	Add <a href="<?php echo $this->url('zfcuser/addprofile') ?>"><?php echo $this->translate('Profile') ?></a>
-	Edit <a href="<?php echo $this->url('zfcuser/editprofile');?>">Profile</a>
+	Edit <a href="<?php echo $this->url('zfcuser/editprofile');?>">Profile</a><br>
+     <a href="<?php echo $this->url('zfcuser/changepassword')?>"><?php echo $this->translate('Change Password'); ?></a><br>
+     <a href="<?php echo $this->url('zfcuser/changeemail')?>"><?php echo $this->translate('Change Email'); ?></a>
+
+ 
 </p>
 <a href="<?php echo $this->url('zfcuser/logout') ?>">[<?php echo $this->translate('Sign Out'); ?>]</a>
 </div>
