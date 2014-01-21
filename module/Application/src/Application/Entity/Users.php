@@ -26,7 +26,7 @@ class Users implements User {
     /** @ORM\Column(type="string", length=255, nullable=TRUE) */
     protected $password_salt;
     
-    /** @ORM\Column(type="string", length=32) */
+    /** @ORM\Column(type="string", length=128) */
     protected $email;
     
     /** @ORM\Column(type="boolean", length=1) */

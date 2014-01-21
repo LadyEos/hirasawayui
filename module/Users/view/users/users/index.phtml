@@ -10,7 +10,14 @@ $user = $this->zfcUserIdentity()->getId();
 </div>
 <div class="container">
 <div class="row">
-<div style="float:left; padding-right:16px;"><?php echo $this->gravatar($this->zfcUserIdentity()->getEmail()) ?></div>
+<div style="float:left; padding-right:16px;">
+<?php 
+if(isset($this->dataGravatar['useGravatar']))
+    echo '<img src="'.$this->dataGravatar['imgURL'].'" height="100px" width="100px"></img>';
+else
+    echo $this->gravatar($this->zfcUserIdentity()->getEmail()) ?>
+
+</div>
 <h3><?php echo $this->translate('Hello'); ?>, <?php 
 if($this->zfcUserDisplayName()!='')
 echo $this->zfcUserDisplayName();

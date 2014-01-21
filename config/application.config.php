@@ -9,12 +9,10 @@ return array(
         'ZfcUser',
         'ZfcUserDoctrineORM',
         'ZfcTwitterBootstrap',
-        //'CrunchyProfile',
-        //'CdliTwoStageSignup',
         'Application',
         //'Oldish',                  // <-- Add this line
         'Users',
-        //'User',
+        'Avatar',
     ),
 
     // These are various options for the listeners attached to the ModuleManager

@@ -77,6 +77,12 @@ class UserProfiles
      */
     protected $gender;
     
+    
+    /**
+     * @ORM\Column(type="string", length=128, nullable=TRUE)
+     */
+    protected $gravatar_email;
+    
     // getters/setters
     public function getId()
     {
@@ -182,6 +188,16 @@ class UserProfiles
     {
     	$this->gender = $gender;
     }
+    
+    public function getGravatarEmail()
+    {
+    	return $this->gravatar_email;
+    }
+    
+    public function setGravatarEmail($gravatarEmail)
+    {
+    	$this->gravatar_email = $gravatarEmail;
+    }
 
     /**
      * Populate from an array.
@@ -219,6 +235,9 @@ class UserProfiles
         
         if (array_key_exists('gender', $data))
         	$this->gender = $data['gender'];
+        
+        if (array_key_exists('gravatar_email', $data))
+        	$this->gravatar_email = $data['gravatar_email'];
         
         return $data;
     }

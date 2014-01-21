@@ -78,7 +78,7 @@ class ProfileForm extends Form
         $this->add(array(
             'name' => 'facebook_link', // 'usr_name',
             'attributes' => array(
-                'type' => 'text'
+                'type' => 'Url'
             ),
             'options' => array(
                 'label' => 'Facebook Profile'
@@ -96,11 +96,21 @@ class ProfileForm extends Form
         $this->add(array(
             'name' => 'webpage', // 'usr_name',
             'attributes' => array(
-                'type' => 'text'
+                'type' => 'Url'
             ),
             'options' => array(
                 'label' => 'Webpage'
             )
+        ));
+        
+        $this->add(array(
+        		'name' => 'gravatar_email', // 'usr_name',
+        		'attributes' => array(
+        				'type' => 'Email'
+        		),
+        		'options' => array(
+        				'label' => 'Gravatar Email'
+        		)
         ));
 
         $this->add(array(

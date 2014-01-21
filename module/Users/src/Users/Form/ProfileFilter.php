@@ -193,5 +193,28 @@ class ProfileFilter extends InputFilter
                 )
             )
         ));
+        
+        $this->add(array(
+        		'name' => 'gravatar_email',
+        		'required' => false,
+        		'filters' => array(
+        				array(
+        						'name' => 'StripTags'
+        				),
+        				array(
+        						'name' => 'StringTrim'
+        				)
+        		),
+        		'validators' => array(
+        				array(
+        						'name' => 'StringLength',
+        						'options' => array(
+        								'encoding' => 'UTF-8',
+        								'min' => 1,
+        								'max' => 128
+        						)
+        				)
+        		)
+        ));
     }
 }

@@ -41,7 +41,25 @@ class UsersController extends ZfcUser
         if (! $this->zfcUserAuthentication()->hasIdentity()) {
             return $this->redirect()->toRoute(static::ROUTE_LOGIN);
         }
-        return new ViewModel();
+        
+        $this->_view = new ViewModel();
+        
+        
+        $objectManager = $this->getOMService()->getEntityManager();
+        $id = $this->zfcUserAuthentication()->getIdentity()->getId();
+        $user = $objectManager->find('Application\Entity\Users', $id);
+        $profile = $user->getUserProfile();
+        
+        if($profile->getProfile_picture_url()!= null){
+            $dataGravatar = array(
+            	'useGravatar' =>false,
+                'imgURL' =>$profile->getProfile_picture_url(),
+            );
+            $this->_view->setVariable('dataGravatar', $dataGravatar);
+        }
+            
+            
+        return $this->_view;
     }
 
     /**
@@ -160,7 +178,7 @@ class UsersController extends ZfcUser
     
     			$objectManager->flush();
     
-    			return $this->redirect()->toRoute('zfcuser/home');
+    			return $this->redirect()->toRoute('avatar/upload');
     		}
     	}
     	return array(
@@ -180,7 +198,7 @@ class UsersController extends ZfcUser
         $user = $objectManager->find('Application\Entity\Users', $id);
         
         if ($user->getUserProfile() == null) {
-        	return $this->redirect()->toRoute('zfcuser/addProfile');
+        	return $this->redirect()->toRoute('zfcuser/addprofile');
         }
         
         $profile = $user->getUserProfile();
@@ -210,6 +228,7 @@ class UsersController extends ZfcUser
             'form' => $form
         );
     }
+    
 
     public function testAction()
     {
@@ -224,73 +243,5 @@ class UsersController extends ZfcUser
         
         return $this->oMService;
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    public function AddProfileActionOld()
-    {
-    	if (! $this->zfcUserAuthentication()->hasIdentity()) {
-    		return $this->redirect()->toRoute(static::ROUTE_LOGIN);
-    	}
-    
-    	$objectManager = $this->getOMService()->getEntityManager();
-    	$user = $objectManager->find('Application\Entity\Users', $this->zfcUserAuthentication()
-    			->getIdentity()
-    			->getId());
-    
-    	if ($user->getUserProfile() != null) {
-    		return $this->redirect()->toRoute('zfcuser/home');
-    	}
-    
-    	$form = new ProfileForm();
-    
-    	$request = $this->getRequest();
-    
-    	if ($request->isPost()) {
-    		$profile = new UserProfiles();
-    
-    		$form->setInputFilter(new ProfileFilter($this->getServiceLocator()));
-    		$form->setData($request->getPost());
-    
-    		if ($form->isValid()) {
-    			$data = $form->getData();
-    			// $this->getServiceLocator()->get('Zend\Log')->info($form->getData());
-    			$res = $profile->populate($form->getData());
-    
-    			$objectManager->persist($profile);
-    
-    			if (array_key_exists('displayname', $data)) {
-    				$user->setDisplayname($data['displayname']);
-    			}
-    
-    			$user->setUserProfile($profile);
-    			$objectManager->persist($user);
-    
-    			$objectManager->flush();
-    
-    			return $this->redirect()->toRoute('zfcuser/home');
-    		}
-    	}
-    	return array(
-    			'form' => $form,
-    			'error' => 'there was an error'
-    	);
-    }
+
 }

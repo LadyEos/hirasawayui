@@ -1,24 +1,24 @@
-<?php 
-echo $this->inlineScript()->prependFile($this->basePath('js/profile.js'));
-
+<?php
+$title = 'Upload Profile Avatar';
+$this->headTitle($title);
+$user = $this->zfcUserIdentity()->getId();
 ?>
-
 <div class="page-header">
-    <h1><?php echo $this->translate('User Profile'); ?></h1>
+    <h1><?php echo $this->translate($title); ?></h1>
 </div>
 
- <?php
- 
+<?php
+//$form = $this->uploadForm;
 $form->prepare();
-//$form->setAttribute('action', $this->url('zfcuser', array('action' => 'addprofile')));
-$form->setAttribute('action', 'addprofile');
+$form->setAttribute('action', $this->url('avatar', array('action' => 'upload')));
+//$form->setAttribute('action', $this->url('avatar/upload'));
 $form->setAttribute('method', 'post');
+echo $this->form()->openTag($form);
+?>
 
- echo $this->form()->openTag($form);
- 
- ?>
-
- <?php foreach ($form as $element) : ?>
+<div class="container">
+<div class="row">
+        <?php foreach ($form as $element) : ?>
 
      <div style="width: 330px;" class="form-group <?php if ($this->formElementErrors($element)) echo "has-error" ?>">
          <?php
@@ -48,5 +48,7 @@ $form->setAttribute('method', 'post');
      </div>
   
  <?php
-endforeach;
-echo $this->form()->closeTag() ?>
+endforeach; 
+echo $this->form()->closeTag(); ?>
+</div>
+</div>

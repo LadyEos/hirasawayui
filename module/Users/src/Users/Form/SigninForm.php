@@ -42,7 +42,7 @@ class SigninForm extends Form
         ));
         $this->add(array(
             'name' => 'email',
-            'type' => 'Text',
+            'type' => 'Email',
             'options' => array(
                 'label' => 'E-mail'
             )
