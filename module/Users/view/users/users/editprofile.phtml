@@ -1,6 +1,6 @@
 <?php 
 echo $this->inlineScript()->prependFile($this->basePath('js/profile.js'));
-
+//var_dump($this);
 ?>
 
 <div class="page-header">
@@ -53,7 +53,7 @@ $form->setAttribute('method', 'post');
  <?php
 endforeach;?>
     </div>
-<div style="width: 330px; height: 500px;" class="col-md-5">
+    <div style="width: 330px; height: 500px;" class="col-md-5">
 
         <div class="panel panel-default">
             <div class="panel-heading">
@@ -67,7 +67,37 @@ endforeach;?>
 
      </div>
      
+     <div style="width: 330px; height: 500px;" class="col-md-5">
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><?php echo $this->translate('Choose another Role!') ?></h3>
+            </div>
+            <div class="panel-body">
+                <p><?php echo sprintf($this->translate('Choose another role, you currently have this role(s):')) ?></p>
+                <p>
+                    <ul>
+                <?php 
+                    if(isset($this->profileTypes)){
+                        foreach ($this->profileTypes as $profile){
+                    	?>
+                        <li><?php echo sprintf($profile->getProfile_name());?></li>                        
+                    
+                    <?php
+                        } 
+                    }else 
+                        echo "You have no roles yet";
+                
+                ?>
+                </ul></p>
+                <p><a class="btn btn-success pull-right" href="<?php echo $this->url('zfcuser/chooserole')?>"><?php echo $this->translate('Add a role!') ?> &raquo;</a></p>
+            </div>
+        </div>
+
+     </div>
+     
 </div>
 
 <?php 
+
 echo $this->form()->closeTag() ?>

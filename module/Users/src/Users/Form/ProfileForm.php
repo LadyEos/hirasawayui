@@ -2,14 +2,21 @@
 namespace Users\Form;
 
 use Zend\Form\Form;
+use DoctrineModule\Persistence\ObjectManagerAwareInterface;
+use Doctrine\ORM\EntityManager;//\ObjectManager;
+use DoctrineModule\Stdlib\Hydrator\DoctrineObject as DoctrineHydrator;
 
-class ProfileForm extends Form
+class ProfileForm extends Form //implements ObjectManagerAwareInterface
 {
-
-    public function __construct($name = null)
+    protected $objectManager;
+    public function __construct($name = null,$sm)
     {
         // we want to ignore the name passed
+        //$this->setObjectManager($objectManager);
         parent::__construct('profile');
+        
+        $hydrator = new DoctrineHydrator($sm->get('doctrine.entitymanager.orm_default'), '\Application\Entity\UserProfiles');
+        $this->setHydrator($hydrator);
         
         $this->add(array(
             'name' => 'displayname', // 'usr_name',
@@ -67,6 +74,17 @@ class ProfileForm extends Form
             )
         ));
         $this->add(array(
+        		'type'    => 'DoctrineModule\Form\Element\ObjectSelect',
+        		'name'    => 'country',
+        		'options' => array(
+        				'label'          => 'Choose your country',
+        				'object_manager' => $sm->get('doctrine.entitymanager.orm_default'),
+        				'target_class'   => 'Application\Entity\Countries',
+        				'property'       => 'country_name',
+        				'empty_option'   => '--- please choose ---'
+        		),
+        ));
+        $this->add(array(
             'name' => 'biography', // 'usr_name',
             'attributes' => array(
                 'type' => 'textarea'
@@ -121,5 +139,17 @@ class ProfileForm extends Form
                 'id' => 'submitbutton'
             )
         ));
+    }
+    
+    public function setObjectManager(EntityManager $objectManager)
+    {
+    	$this->objectManager = $objectManager;
+    
+    	return $this;
+    }
+    
+    public function getObjectManager()
+    {
+    	return $this->objectManager;
     }
 }

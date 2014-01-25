@@ -60,7 +60,7 @@ class UserProfiles
      * @ORM\ManyToOne(targetEntity="Countries", inversedBy="profiles")
      * @ORM\JoinColumn(name="country_id", referencedColumnName="id")
      */
-    protected $countries;
+    protected $country;
 
     /**
      * @ORM\OneToOne(targetEntity="Users", mappedBy="user_profile")
@@ -198,6 +198,16 @@ class UserProfiles
     {
     	$this->gravatar_email = $gravatarEmail;
     }
+    
+    public function getCountry()
+    {
+    	return $this->country;
+    }
+    
+    public function setCountry($country)
+    {
+    	$this->country = $country;
+    }
 
     /**
      * Populate from an array.
@@ -239,6 +249,9 @@ class UserProfiles
         if (array_key_exists('gravatar_email', $data))
         	$this->gravatar_email = $data['gravatar_email'];
         
+        //if (array_key_exists('country', $data))
+        	//$this->countries = $data['country'];
+        
         return $data;
     }
 
@@ -262,12 +275,12 @@ class UserProfiles
         return $data;
     }
 
-    public function getDisplayName()
+    public function getDisplayname()
     {
         return $this->displayname;
     }
 
-    public function setDisplayName($displayName)
+    public function setDisplayname($displayName)
     {
         $this->displayname = $displayName;
     }

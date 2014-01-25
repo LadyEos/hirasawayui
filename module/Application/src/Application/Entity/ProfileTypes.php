@@ -49,4 +49,37 @@ class ProfileTypes {
 	public function setProfile_key($profile_key){
 		$this->profile_key = $profile_key;
 	}
+	
+	public function getArrayCopy()
+	{
+		return get_object_vars($this);
+	}
+	
+    public function getUsers(){
+		return $this->users;
+	}
+
+	public function setUsers($users){
+		$this->users = $users;
+	}
+	
+	
+	public function hasUser (Users $user) {
+		$users = array();
+		foreach ($this->getUsers() as $arrMember) {
+			$users[] = $arrMember->getUsername();
+		}
+		if (in_array($user->getUsername(), $users))    //check if the supplied language is to be removed or not
+			return true;
+	}
+	
+	public function unsetUser (Users $user) {
+		$this->users->removeElement($user);
+		//$user->removeProfileType();
+	}
+	
+	public function setUser (Users $user) {
+		//$user->addProfileType($this);
+		$this->users[] = $user;
+	}
 }

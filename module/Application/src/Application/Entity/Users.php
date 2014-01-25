@@ -235,6 +235,34 @@ class Users implements User {
     	$this->senders = $senders;
     }
     
+    public function getDisplayName(){
+    	return $this->displayname;
+    }
+    
+    public function setDisplayName($displayName){
+    	$this->displayname = $displayName;
+    }
+    
+    public function setId($id){
+    	$this->id = $id;
+    }
+    
+    public function getState(){
+    	return $this->state;
+    }
+    
+    public function setState($state){
+    	$this->state = $state;
+    }
+    
+    public function getUserProfile(){
+    	return $this->user_profile;
+    }
+    
+    public function setUserProfile($userprofile){
+    	$this->user_profile = $userprofile;
+    }
+    
     /**
      * Convert the object to an array.
      *
@@ -279,33 +307,33 @@ class Users implements User {
     	return $this;
     }
     
-    public function getDisplayName(){
-    	return $this->displayname;
+    
+    
+    
+    
+    /* Collection */
+    
+    public function hasProfileType(ProfileTypes $profileType) {
+    	$profileTypes = array();
+    	foreach ($this->getProfile_types() as $arrMember) {
+    		$profileTypes[] = $arrMember->getProfile_key();
+    	}
+    	if (in_array($profileType->getProfile_key(), $profileTypes))    //check if the supplied language is to be removed or not
+    		return true;
+    	else 
+    	    return false;
     }
     
-    public function setDisplayName($displayName){
-    	$this->displayname = $displayName;
+    public function removeProfileType (ProfileTypes $profileType) {
+    	$this->profile_types->removeElement($profileType);
+    	$profileType->unsetUser($this);
     }
     
-    public function setId($id){
-    	$this->id = $id;
+    public function addProfileType (ProfileTypes $profileType) {
+    	$profileType->setUser($this);
+    	$this->profile_types[] = $profileType;
     }
-    
-    public function getState(){
-    	return $this->state;
-    }
-    
-    public function setState($state){
-    	$this->state = $state;
-    }
-    
-    public function getUserProfile(){
-    	return $this->user_profile;
-    }
-    
-    public function setUserProfile($userprofile){
-    	$this->user_profile = $userprofile;
-    }
+    /* end Languages methods */
     
 
 }

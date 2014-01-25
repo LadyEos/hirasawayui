@@ -47,7 +47,7 @@ class Module
                 'Zend\Authentication\AuthenticationService' => function ($serviceManager)
                 {
                     return $serviceManager->get('doctrine.authenticationservice.orm_default');
-                }
+                },
             ),
             'invokables' => array(
                 'Application\Service\AuthService' => 'Application\Service\AuthService'

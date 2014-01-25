@@ -9,11 +9,14 @@ use Application\Entity\UserProfiles;
 use Avatar\Form\UploadFilter;
 use Avatar\Form\UploadForm;
 use Zend\File\Transfer\Adapter\Http;
+use Zend\Console\Request;
 
 class AvatarController extends AbstractActionController
 {
 
     protected $oMService;
+    protected $flag = false;
+    protected $uriPaths = array();
 
     public function indexAction()
     {
@@ -41,7 +44,9 @@ class AvatarController extends AbstractActionController
         
         $profile = $user->getUserProfile();
         
+        //$this->_view = new ViewModel();
         $form = new UploadForm('upload-form');
+
         $upload = new \Zend\File\Transfer\Transfer();
         $upload->setDestination('./public'.$url);
         $upload->addFilter('File\Rename',array(
@@ -60,12 +65,7 @@ class AvatarController extends AbstractActionController
             if ($form->isValid()) {
 
                 if ($upload->receive()) {
-                    // Code to process the file goes here
                     $file = $upload->getFileInfo();
-                    //$this->getServiceLocator()->get('Zend\Log')->info($file);
-                    
-                    //$this->getServiceLocator()->get('Zend\Log')->info($url.$file['file']['name']);
-                    
                     $profile->setProfile_picture_url($url.$file['file']['name']);
                     $objectManager->flush();
                     
@@ -78,7 +78,7 @@ class AvatarController extends AbstractActionController
         }
         
         return array(
-            'form' => $form
+            'form' => $form,
         );
     }
 

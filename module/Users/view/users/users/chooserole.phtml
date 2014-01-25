@@ -1,0 +1,53 @@
+<?php
+$title = 'Choose a role';
+$this->headTitle($title);
+$user = $this->zfcUserIdentity()->getId();
+
+?>
+<div style="height:20px"></div>
+<div class="row">
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><?php echo $this->translate('Vocalist') ?></h3>
+            </div>
+            <div class="panel-body">
+                <p><?php echo sprintf($this->translate('Do you sing?')) ?></p>
+                <p><?php echo sprintf($this->translate('Dont worry you can change or choose more than one later ')) ?></p>
+                <p><a class="btn btn-success pull-right" href="<?php echo $this->url('zfcuser/vocalist')?>"><?php echo $this->translate('I choose you!') ?> &raquo;</a></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><?php echo $this->translate('Lyricist') ?></h3>
+            </div>
+            <div class="panel-body">
+                <p><?php echo sprintf($this->translate('Do you write lyrics?')) ?></p>
+                <p><?php echo sprintf($this->translate('Dont worry you can change or choose more than one later ')) ?></p>
+                <p><a class="btn btn-success pull-right" href="<?php echo $this->url('zfcuser/lyricist');?>"><?php echo $this->translate('I choose you!') ?> &raquo;</a></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><?php echo $this->translate('Composer') ?></h3>
+            </div>
+            <div class="panel-body">
+                <p><?php echo sprintf($this->translate('Do you compose music?')) ?></p>
+                <p><?php echo sprintf($this->translate('Dont worry you can change or choose more than one later ')) ?></p>
+                <p><a class="btn btn-success pull-right" href="<?php echo $this->url('zfcuser/composer');?>"><?php echo $this->translate('I choose you!') ?> &raquo;</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="jumbotron">
+    <h1><?php echo sprintf('Music Store', '<span class="zf-green">', '</span>') ?></h1>
+    <p><?php echo sprintf($this->translate('not interested! i just want to buy music!')) ?></p>
+    <p><?php echo sprintf($this->translate('Dont worry you can change later :) btw if you choose this and had other roles the other roles will be deleted :P since all roles include this one muahahah OTL')) ?></p>
+    <p><a class="btn btn-success btn-lg" href="<?php echo $this->url('zfcuser/basic')?>"><?php echo $this->translate('Gimme music baby!') ?> &raquo;</a></p>
+</div>

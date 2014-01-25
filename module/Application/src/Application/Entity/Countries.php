@@ -33,19 +33,19 @@ class Countries {
 		return $this->id;
 	}
 
-	public function getCountryName(){
+	public function getCountry_name(){
 		return $this->country_name;
 	}
 
-	public function setCountryName($name){
+	public function setCountry_name($name){
 		$this->country_name = $name;
 	}
 	
-	public function getCountryCode(){
+	public function getCountry_code(){
 		return $this->country_code;
 	}
 	
-	public function setCountryCode($code){
+	public function setCountry_code($code){
 		$this->country_code = $code;
 	}
 	
