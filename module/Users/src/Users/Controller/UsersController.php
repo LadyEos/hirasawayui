@@ -6,16 +6,14 @@ use Zend\View\Model\ViewModel;
 use Doctrine\ORM\EntityManager;
 use Application\Entity\Users;
 use Application\Entity\UserProfiles;
-use Users\Form\ProfileFilter;
-use Users\Form\ProfileForm;
 use ZfcUser\Controller\UserController as ZfcUser;
 use Zend\Stdlib\ResponseInterface as Response;
 use Zend\Stdlib\Parameters;
 use ZfcUser\Service\User as UserService;
-
 use Application\Entity\ProfileTypes;
 use Zend\Http\Request;
 use Zend\Session\Container;
+use Users\Form\RoleForm;
 
 class UsersController extends ZfcUser
 {
@@ -27,7 +25,13 @@ class UsersController extends ZfcUser
      */
     protected $registerForm;
 
-    protected $oMService;
+    protected $userService;
+
+    protected $profileTypeService;
+
+    protected $appUserService;
+    
+    protected $ptEntity = 'Application\Entity\ProfileTypes';
 
     /**
      *
@@ -47,21 +51,17 @@ class UsersController extends ZfcUser
         
         $this->_view = new ViewModel();
         
-        
-        $objectManager = $this->getOMService()->getEntityManager();
-        $id = $this->zfcUserAuthentication()->getIdentity()->getId();
-        $user = $objectManager->find('Application\Entity\Users', $id);
+        $user = $this->getAppUserService()->findAndSetUser($this->zfcUserAuthentication()->getIdentity()->getId());
         $profile = $user->getUserProfile();
         
-        if($profile!= null && $profile->getProfile_picture_url()!= null){
+        if ($profile != null && $profile->getProfile_picture_url() != null) {
             $dataGravatar = array(
-            	'useGravatar' =>false,
-                'imgURL' =>$profile->getProfile_picture_url(),
+                'useGravatar' => false,
+                'imgURL' => $profile->getProfile_picture_url()
             );
             $this->_view->setVariable('dataGravatar', $dataGravatar);
         }
-            
-            
+        
         return $this->_view;
     }
 
@@ -128,7 +128,7 @@ class UsersController extends ZfcUser
                 $post['identity'] = $user->getUsername();
             }
             $post['credential'] = $post['password'];
-            //$request->getQuery()->set('redirect', 'addprofile');
+            // $request->getQuery()->set('redirect', 'addprofile');
             $request->getQuery()->set('redirect', 'choose');
             $request->setPost(new Parameters($post));
             return $this->forward()->dispatch(static::CONTROLLER_NAME, array(
@@ -141,108 +141,200 @@ class UsersController extends ZfcUser
             ->fromRoute(static::ROUTE_LOGIN) . ($redirect ? '?redirect=' . rawurlencode($redirect) : ''));
     }
 
-    public function addprofileAction()
+    public function vocalistAction()
     {
-        if (! $this->zfcUserAuthentication()->hasIdentity()) {
-    		return $this->redirect()->toRoute(static::ROUTE_LOGIN);
-    	}
-    
-    	$objectManager = $this->getOMService()->getEntityManager();
-    	$user = $objectManager->find('Application\Entity\Users', $this->zfcUserAuthentication()
-    			->getIdentity()
-    			->getId());
-    
-    	if ($user->getUserProfile() != null) {
-    		return $this->redirect()->toRoute('zfcuser/home');
-    	}
-    
-    	$form = new ProfileForm('profile',$this->getServiceLocator());
-    	$form->setAttribute('method', 'post');
+        $user = $this->getAppUserService()->findAndSetUser($this->zfcUserAuthentication()->getIdentity()->getId());
+        $this->getAppUserService()->setUser($user);
+        
+        $query = 'SELECT pt FROM '.$this->ptEntity.' pt WHERE pt.profile_key = :key';
+        $profTypes = $this->getProfileTypeService()->query($query, array('key' => 'PVo'));
 
-    	$request = $this->getRequest();
+        if (! $user->hasProfileType($profTypes[0])) {
 
-    	if ($request->isPost()) {
-    		$profile = new UserProfiles();
-    
-    		$form->setInputFilter(new ProfileFilter($this->getServiceLocator()));
-    		$form->setData($request->getPost());
-    		
-    		if ($form->isValid()) {
-    			$data = $form->getData();
-    			//$this->getServiceLocator()->get('Zend\Log')->info($form->getData());
-    			$res = $profile->populate($form->getData());
-    
-    			$objectManager->persist($profile);
-    
-    			if (array_key_exists('displayname', $data)) {
-    				$user->setDisplayname($data['displayname']);
-    			}
-    			
-    			//$data = array_merge_recursive($this->getRequest()->getPost()->toArray());
-    			
-    			//$this->getServiceLocator()->get('Zend\Log')->info($data);
-    			
-    			$country = $objectManager->find('Application\Entity\Countries', $data['country']);
-    			$profile->setCountry($country);
-    
-    			$user->setUserProfile($profile);
-    			$objectManager->persist($user);
-    
-    			$objectManager->flush();
-    
-    			return $this->redirect()->toRoute('avatar',array('action'=>'upload'));
-    		}
-    	}
-    	return array(
-    			'form' => $form,
-    			'error' => 'there was an error'
-    	);
-    }
-
-    public function editprofileAction()
-    {
-        if (! $this->zfcUserAuthentication()->hasIdentity()) {
-        	return $this->redirect()->toRoute(static::ROUTE_LOGIN);
+            $query = 'SELECT pt FROM '.$this->ptEntity.' pt WHERE pt.profile_key = :key';
+            $basic = $this->getProfileTypeService()->query($query, array('key' => 'B'));
+            
+            foreach ($basic as $profile) {
+                $this->getAppUserService()->removeProfileType($profile);
+            }
+            
+            $this->getAppUserService()->addProfileType($profTypes[0]);
         }
-
-        $objectManager = $this->getOMService()->getEntityManager();
-        $id = $this->zfcUserAuthentication()->getIdentity()->getId();
-        $user = $objectManager->find('Application\Entity\Users', $id);
         
         if ($user->getUserProfile() == null) {
-        	return $this->redirect()->toRoute('zfcuser/addprofile');
+            return $this->redirect()->toRoute('profile', array(
+                'action' => 'add'
+            ));
         }
-        //print_r($user->getProfile_types()->toArray());
+        
+        return $this->redirect()->toRoute('profile', array(
+            'action' => 'edit'
+        ));
+    }
 
+    public function lyricistAction()
+    {
+        $user = $this->getAppUserService()->findAndSetUser($this->zfcUserAuthentication()->getIdentity()->getId());
+        $this->getAppUserService()->setUser($user);
+
+        $query = 'SELECT pt FROM '.$this->ptEntity.' pt WHERE pt.profile_key = :key';
+        $profTypes = $this->getProfileTypeService()->query($query, array('key' => 'PLy'));
         
-        $profile = $user->getUserProfile();
+        if (! $user->hasProfileType($profTypes[0])) {
+
+            $query = 'SELECT pt FROM '.$this->ptEntity.' pt WHERE pt.profile_key = :key';
+            $basic = $this->getProfileTypeService()->query($query, array('key' => 'B'));
+            
+            foreach ($basic as $profile) {
+                $this->getAppUserService()->removeProfileType($profile);
+            }
+            
+            $this->getAppUserService()->addProfileType($profTypes[0]);
+        }
         
-        $form = new ProfileForm('profile',$this->getServiceLocator());
+        if ($user->getUserProfile() == null) {
+            return $this->redirect()->toRoute('profile', array(
+                'action' => 'add'
+            ));
+        }
         
-        $form->setBindOnValidate(false);
-        $form->bind($profile);
+        return $this->redirect()->toRoute('profile', array(
+            'action' => 'edit'
+        ));
         
+    }
+
+    public function composerAction()
+    {
+        $user = $this->getAppUserService()->findAndSetUser($this->zfcUserAuthentication()->getIdentity()->getId());
+        $this->getAppUserService()->setUser($user);
+        
+        $query = 'SELECT pt FROM '.$this->ptEntity.' pt WHERE pt.profile_key = :key';
+        $profTypes = $this->getProfileTypeService()->query($query, array('key' => 'PCo'));
+        
+        if (! $user->hasProfileType($profTypes[0])) {
+
+            $query = 'SELECT pt FROM '.$this->ptEntity.' pt WHERE pt.profile_key = :key';
+            $basic = $this->getProfileTypeService()->query($query, array('key' => 'B'));
+            
+            foreach ($basic as $profile) {
+                $this->getAppUserService()->removeProfileType($profile);
+            }
+            
+            $this->getAppUserService()->addProfileType($profTypes[0]);
+        }
+        
+        if ($user->getUserProfile() == null) {
+            return $this->redirect()->toRoute('profile', array(
+                'action' => 'add'
+            ));
+        }
+       
+        return $this->redirect()->toRoute('profile', array(
+            'action' => 'edit'
+        ));
+    }
+
+    public function basicAction()
+    {
+        $user = $this->getAppUserService()->findAndSetUser($this->zfcUserAuthentication()->getIdentity()->getId());
+        $this->getAppUserService()->setUser($user);
+        
+        $query = 'SELECT pt FROM '.$this->ptEntity.' pt WHERE pt.profile_key = :key';
+        $profType = $this->getProfileTypeService()->query($query, array('key' => 'B'));
+        
+        if (! $user->hasProfileType($profTypes[0])) {
+            $basic = $profTypes[0];
+            
+            $query = 'SELECT pt FROM '.$this->ptEntity.' pt WHERE pt.profile_key = :key';
+            $profTypes = $this->getProfileTypeService()->query($query, array('key' => 'B'));
+            
+            foreach ($profTypes as $profile) {
+                $this->getAppUserService()->removeProfileType($profile);
+            }
+            
+            $this->getAppUserService()->addProfileType($basic);
+        }
+        
+        if ($user->getUserProfile() == null) {
+            return $this->redirect()->toRoute('profile', array(
+                'action' => 'add'
+            ));
+        }
+        
+        $session = new Container('Users');
+        $url = $session->redirect;
+        if ($url == "profile/edit") {
+            // $this->getServiceLocator()->get('Zend\Log')->info($urlFull[0],$urlFull[1]);
+            // return $this->redirect()->toRoute($urlFull[0],$urlFull[1]);
+            return $this->redirect()->toRoute('profile', array(
+                'action' => 'edit'
+            ));
+        }
+        return $this->redirect()->toRoute('profile', array(
+            'action' => 'edit'
+        ));
+        // return $this->redirect()->toRoute($this->replaceUrl($url));
+        
+        // return $this->redirect()->toRoute('zfcuser/home');
+    }
+
+    public function chooseroleAction()
+    {
+        if (! $this->zfcUserAuthentication()->hasIdentity()) {
+            return $this->redirect()->toRoute(static::ROUTE_LOGIN);
+        }
+        
+        $headers = $this->getRequest()->getHeaders();
+        if ($headers->has('Referer')) {
+            $session = new Container('Users');
+            $session->redirect = $this->getRequest()
+                ->getHeader('Referer')
+                ->uri()
+                ->getPath();
+            $this->getServiceLocator()
+                ->get('Zend\Log')
+                ->info('choose' . $session->redirect);
+        } else {
+            return $this->redirect()->toRoute('zfcuser/home');
+        }
+        
+        return new ViewModel();
+    }
+
+    public function deleteroleAction()
+    {
+        if (! $this->zfcUserAuthentication()->hasIdentity()) {
+            return $this->redirect()->toRoute(static::ROUTE_LOGIN);
+        }
+        
+        $user = $this->getAppUserService()->findAndSetUser($this->zfcUserAuthentication()->getIdentity()->getId());
+        $this->getAppUserService()->setUser($user);
+        $roles = $user->getProfile_types()->toArray();
+        
+        $form = new RoleForm('role', $this->buildRoleSelectbox($roles));
+        $form->setAttribute('method', 'post');
         
         $request = $this->getRequest();
         if ($request->isPost()) {
-            $form->setInputFilter(new ProfileFilter($this->getServiceLocator()));
+            
             $form->setData($request->getPost());
             if ($form->isValid()) {
-                $form->bindValues();
                 
-                $data = array_merge_recursive(
-                		$this->getRequest()->getPost()->toArray());
+                $data = array_merge_recursive($this->getRequest()->getPost()->toArray());
                 
-               
+                $key = $data['profile_types'];
                 
-                $country = $objectManager->find('Application\Entity\Countries', $data['country']);
-                $profile->setCountry($country);
+                $query = 'SELECT pt FROM Application\Entity\ProfileTypes pt WHERE pt.profile_key = :key';
+                $profType = $this->getProfileTypeService()->query($query, array(
+                    'key' => $key
+                ));
                 
-                $user->setDisplayName($form->getData()->getDisplayName());
+                $this->getAppUserService()->removeProfileType($profType[0]);
                 
-                $objectManager->flush();
-                
-                return $this->redirect()->toRoute('zfcuser/home');
+                return $this->redirect()->toRoute('profile', array(
+                    'action' => 'edit'
+                ));
             }
         }
         
@@ -252,181 +344,61 @@ class UsersController extends ZfcUser
             'profileTypes' => $user->getProfile_types()->toArray()
         );
     }
-    
-    public function vocalistAction()
-    {
-        $objectManager = $this->getOMService()->getEntityManager();
-        $id = $this->zfcUserAuthentication()->getIdentity()->getId();
-        $user = $objectManager->find('Application\Entity\Users', $id);
-        
-        $query = $objectManager->createQuery('SELECT pt FROM Application\Entity\ProfileTypes pt WHERE pt.profile_key = :key');
-        $query->setParameter('key', 'PVo');
-        $profTypes = $query->getResult();
-
-        if(!$user->hasProfileType($profTypes[0])){
-            
-            $query = $objectManager->createQuery('SELECT pt FROM Application\Entity\ProfileTypes pt WHERE pt.profile_key = :key');
-            $query->setParameter('key', 'B');
-            $basic = $query->getResult();
-            foreach ($basic as $profile){
-            	$user->removeProfileType($profile);
-            }
-            
-            $user->addProfileType($profTypes[0]);
-            $objectManager->flush();
-        }
-        
-        if ($user->getUserProfile() == null) {
-        	return $this->redirect()->toRoute('zfcuser/addprofile');
-        }
-        
-        $session = new Container('Users');
-        $url = $session->redirect;
-        return $this->redirect()->toRoute($this->replaceUrl($url));
-        //return $this->redirect()->toRoute('zfcuser/home');
-    }
-    
-    public function lyricistAction()
-    {
-        $objectManager = $this->getOMService()->getEntityManager();
-        $id = $this->zfcUserAuthentication()->getIdentity()->getId();
-        $user = $objectManager->find('Application\Entity\Users', $id);
-        
-        
-        
-        $query = $objectManager->createQuery('SELECT pt FROM Application\Entity\ProfileTypes pt WHERE pt.profile_key = :key');
-        $query->setParameter('key', 'PLy');
-        $profTypes = $query->getResult();
-        
-        if(!$user->hasProfileType($profTypes[0])){
-            
-            $query = $objectManager->createQuery('SELECT pt FROM Application\Entity\ProfileTypes pt WHERE pt.profile_key = :key');
-            $query->setParameter('key', 'B');
-            $basic = $query->getResult();
-            foreach ($basic as $profile){
-            	$user->removeProfileType($profile);
-            }
-            
-            $user->addProfileType($profTypes[0]);
-            $objectManager->flush();
-        }
-        
-        if ($user->getUserProfile() == null) {
-        	return $this->redirect()->toRoute('zfcuser/addprofile');
-        }
-        
-        $session = new Container('Users');
-        $url = $session->redirect;
-        return $this->redirect()->toRoute($this->replaceUrl($url));
-        //return $this->redirect()->toRoute('zfcuser/home');
-    }
-    
-    public function composerAction()
-    {
-        $objectManager = $this->getOMService()->getEntityManager();
-        $id = $this->zfcUserAuthentication()->getIdentity()->getId();
-        $user = $objectManager->find('Application\Entity\Users', $id);
-        
-        $query = $objectManager->createQuery('SELECT pt FROM Application\Entity\ProfileTypes pt WHERE pt.profile_key = :key');
-        $query->setParameter('key', 'PCo');
-        $profTypes = $query->getResult();
-        
-        if(!$user->hasProfileType($profTypes[0])){
-            
-            $query = $objectManager->createQuery('SELECT pt FROM Application\Entity\ProfileTypes pt WHERE pt.profile_key = :key');
-            $query->setParameter('key', 'B');
-            $basic = $query->getResult();
-            foreach ($basic as $profile){
-            	$user->removeProfileType($profile);
-            }
-            
-            
-            $user->addProfileType($profTypes[0]);
-            $objectManager->flush();
-        }
-        
-        if ($user->getUserProfile() == null) {
-        	return $this->redirect()->toRoute('zfcuser/addprofile');
-        }
-        
-        $session = new Container('Users');
-        $url = $session->redirect;
-        return $this->redirect()->toRoute($this->replaceUrl($url));
-        
-        //return $this->redirect()->toRoute('zfcuser/home');
-    }
-    
-    public function basicAction()
-    {
-        $objectManager = $this->getOMService()->getEntityManager();
-        $id = $this->zfcUserAuthentication()->getIdentity()->getId();
-        $user = $objectManager->find('Application\Entity\Users', $id);
-        
-        $query = $objectManager->createQuery('SELECT pt FROM Application\Entity\ProfileTypes pt WHERE pt.profile_key = :key');
-        $query->setParameter('key', 'B');
-        $profTypes = $query->getResult();
-        
-        if(!$user->hasProfileType($profTypes[0])){
-            $basic = $profTypes[0];
-            
-            $query = $objectManager->createQuery('SELECT pt FROM Application\Entity\ProfileTypes pt WHERE pt.profile_key != :key');
-            $query->setParameter('key', 'B');
-            $profTypes = $query->getResult();
-            foreach ($profTypes as $profile){
-            	$user->removeProfileType($profile);
-            }
-            
-            $user->addProfileType($basic);
-            $objectManager->flush();
-        }
-        
-        if ($user->getUserProfile() == null) {
-        	return $this->redirect()->toRoute('zfcuser/addprofile');
-        }
-        
-        $session = new Container('Users');
-        $url = $session->redirect;
-        return $this->redirect()->toRoute($this->replaceUrl($url));
-        
-        //return $this->redirect()->toRoute('zfcuser/home');
-    }
-    
-    public function chooseroleAction()
-    {
-        if (! $this->zfcUserAuthentication()->hasIdentity()) {
-        	return $this->redirect()->toRoute(static::ROUTE_LOGIN);
-        }
-
-        $headers = $this->getRequest()->getHeaders();
-        if($headers->has('Referer')){
-            $session = new Container('Users');
-            $session->redirect = $this->getRequest()->getHeader('Referer')->uri()->getPath();
-            $this->getServiceLocator()->get('Zend\Log')->info('choose'.$session->redirect);
-        }else{
-            return $this->redirect()->toRoute('zfcuser/home');
-        }
-
-        return new ViewModel();
-    }
 
     public function testAction()
     {
         return new ViewModel();
     }
 
-    private function getOMService()
+    private function replaceUrl($string)
     {
-        if (! $this->oMService) {
-            $this->oMService = $this->getServiceLocator()->get('Application\Service\DoctrineOMService');
-        }
-        
-        return $this->oMService;
-    }
-    
-    private function replaceUrl($string){
-    	$change = '/user';
-    	$url = 'zfcuser';
-    	return str_replace($change, $url, $string);
+        $this->getServiceLocator()
+            ->get('Zend\Log')
+            ->info($string);
+        if (strpos($string, 'zfcuser') !== FALSE) {
+            $change = '/user';
+            $url = 'zfcuser';
+            return str_replace($change, $url, $string);
+        } elseif (strpos($string, 'profile') !== FALSE) {
+            echo gettype($string);
+            $strs = explode('/', $string);
+            // $arr = array_diff($strs, array("/"));
+            $action = array(
+                $strs[1],
+                array(
+                    'action' => $strs[2]
+                )
+            );
+            return $action;
+        } else
+            return $string;
     }
 
+    private function buildRoleSelectbox($roles)
+    {
+        $select = array();
+        foreach ($roles as $role) {
+            $select[$role->getProfile_key()] = $role->getProfile_name();
+        }
+        
+        return $select;
+    }
+
+    private function getAppUserService()
+    {
+        if (! $this->appUserService) {
+            $this->appUserService = $this->getServiceLocator()->get('Application\Service\UserService');
+        }
+        
+        return $this->appUserService;
+    }
+
+    private function getProfileTypeService()
+    {
+        if (! $this->profileTypeService) {
+            $this->profileTypeService = $this->getServiceLocator()->get('Application\Service\ProfileTypeService');
+        }
+        
+        return $this->profileTypeService;
+    }
 }

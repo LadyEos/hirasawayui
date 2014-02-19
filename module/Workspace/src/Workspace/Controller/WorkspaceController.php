@@ -5,35 +5,59 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Doctrine\ORM\EntityManager;
 use Application\Entity\Users;
-
+use Workspace\Form\SampleForm;
+use Workspace\Form\SampleFilter;
+use Workspace\Form\SampleLyricsForm;
+use Workspace\Form\SampleLyricsFilter;
+use Application\Entity;
+use Application\Entity\SongsVersionHistory;
+use Application\Entity\Songs;
+use Zend\File\Transfer\Adapter\Http;
 
 class WorkspaceController extends AbstractActionController
 {
 
-    protected $oMService;
+    protected $userService;
 
-    
     public function indexAction()
     {
-        $objectManager = $this->getOMService()->getEntityManager();
-        $repository = $objectManager->getRepository('Application\Entity\Users');
-        $allusers = $repository->findAll();
-
-        return new ViewModel(array(
-        		'users' => $allusers
-        ));
-        
         return new ViewModel();
     }
-    
-  
-    
-    private function getOMService()
+
+    public function workspaceAction()
     {
-    	if (!$this->oMService) {
-    		$this->oMService = $this->getServiceLocator()->get('Application\Service\DoctrineOMService');
+        if (! $this->zfcUserAuthentication()->hasIdentity()) {
+            return $this->redirect()->toRoute(static::ROUTE_LOGIN);
+        }
+        
+        $user = $this->getUserService()->findAndSetUser($this->zfcUserAuthentication()->getIdentity()->getId());
+        
+        if($user->getProfile_types()->first()->getProfile_key() =='B')
+            return $this->redirect()->toRoute('zfcuser/home');
+        
+        $this->_view = new ViewModel();
+        $profileTypes = $user->getProfile_types()->toArray();
+        
+        $this->_view->setVariable('profileTypes', $profileTypes);
+        return $this->_view;
+    }
+
+    public function searchAction()
+    {
+        return new ViewModel();
+    }
+
+    public function postAction()
+    {
+        return new ViewModel();
+    }
+
+    private function getUserService()
+    {
+    	if (!$this->userService) {
+    		$this->userService = $this->getServiceLocator()->get('Application\Service\UserService');
     	}
     
-    	return $this->oMService;
+    	return $this->userService;
     }
 }

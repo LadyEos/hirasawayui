@@ -1,0 +1,91 @@
+<?php echo $this->inlineScript()->prependFile($this->basePath('js/musicplayer.js')); ?>
+<?php
+$title = $this->song->getName();
+$this->headTitle($title);
+$version = $this->song->getVersions()->first();
+?>
+<h1><?php echo $this->escapeHtml($title); ?></h1>
+
+
+<div id="audioWrapper">
+<?php echo '<input type="hidden" id="filePath" value="' . '/uploads' . $version->getUrl() . '"/>';?>
+<?php if($version->getUrl() != null):?>
+<div id="audioPlayerContainer">
+<div id="jquery_jplayer_1" class="jp-jplayer"></div>
+  <div id="jp_container_1" class="jp-audio">
+    <div class="jp-type-single">
+      <div class="jp-gui jp-interface">
+        <ul class="jp-controls">
+          <li><a href="javascript:;" class="jp-play" tabindex="1">play</a></li>
+          <li><a href="javascript:;" class="jp-pause" tabindex="1">pause</a></li>
+          <li><a href="javascript:;" class="jp-stop" tabindex="1">stop</a></li>
+          <li><a href="javascript:;" class="jp-mute" tabindex="1" title="mute">mute</a></li>
+          <li><a href="javascript:;" class="jp-unmute" tabindex="1" title="unmute">unmute</a></li>
+          <li><a href="javascript:;" class="jp-volume-max" tabindex="1" title="max volume">max volume</a></li>
+        </ul>
+        <div class="jp-progress">
+          <div class="jp-seek-bar">
+            <div class="jp-play-bar"></div>
+          </div>
+        </div>
+        <div class="jp-volume-bar">
+          <div class="jp-volume-bar-value"></div>
+        </div>
+        <div class="jp-time-holder">
+          <div class="jp-current-time"></div>
+          <div class="jp-duration"></div>
+          <ul class="jp-toggles">
+            <li><a href="javascript:;" class="jp-repeat" tabindex="1" title="repeat">repeat</a></li>
+            <li><a href="javascript:;" class="jp-repeat-off" tabindex="1" title="repeat off">repeat off</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="jp-title">
+        <ul>
+          <li><?php echo $this->song->getName();?></li>
+        </ul>
+      </div>
+      <div class="jp-no-solution">
+        <span>Update Required</span>
+        To play the media you will need to either update your browser to a recent version or update your <a href="http://get.adobe.com/flashplayer/" target="_blank">Flash plugin</a>.
+      </div>
+    </div>
+  </div>
+</div>
+<?php endif;?>
+</div>
+
+
+
+<div id="lyricsWrapper">
+    <?php if($version->getLyrics()!=null):?>
+    <div>
+        <?php echo nl2br($version->getLyrics())?>
+    </div>
+    <hr>
+    <?php endif; ?>
+</div>
+<div id="infoWrapper">
+    <?php
+    echo '<br>';
+    echo '<p>Description<br>' . $this->song->getDescription() . '</p>';
+    echo '<p>Notes<br>' . $this->song->getNotes() . '</p>';
+    // echo '<hr>';
+    // echo '<p>Version Comments<br></p>';
+    // echo '<p>'.$this->song->getVersions()->first()->getComments().'</p>';
+    ?>
+</div>
+<div id="authorWrapper">
+    <?php
+    if (isset($this->author)){?>
+    <a
+    	href="<?php echo $this->url('song',array('action'=>'edit','id'=>$this->song->getId())) ?>">
+        <?php echo $this->translate('Edit') ?></a>
+    <a
+    	href="<?php echo $this->url('song',array('action'=>'delete','id'=>$this->song->getId())) ?>">
+        <?php echo $this->translate('Delete') ?></a>
+    <?php }?>
+    <br>
+    <br>
+</div>
+

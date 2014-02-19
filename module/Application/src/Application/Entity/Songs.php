@@ -15,6 +15,9 @@ class Songs {
 	
 	/** @ORM\Column(type="boolean", length=1) */
 	protected $completed;
+	
+	/** @ORM\Column(type="boolean", length=1) */
+	protected $sample;
 
 	/** @ORM\Column(type="string", length=500) */
 	protected $notes;
@@ -32,6 +35,7 @@ class Songs {
 	
 	/**
 	 * @ORM\OneToMany(targetEntity="SongsVersionHistory", mappedBy="songs")
+	 * @ORM\OrderBy({"created" = "DESC"})
 	 **/
 	protected $versions;
 	
@@ -93,6 +97,14 @@ class Songs {
 
 	public function setCompleted($completed){
 		$this->completed = $completed;
+	}
+	
+ 	public function getSample(){
+		return $this->sample;
+	}
+	
+	public function setSample($sample){
+		$this->sample = $sample;
 	}
 
 	public function getNotes(){
@@ -162,4 +174,116 @@ class Songs {
 	public function setLikes($likes){
 		$this->likes = $likes;
 	}
+	
+	public function getUsers(){
+		return $this->users;
+	}
+	
+	
+	/**
+	 * Convert the object to an array.
+	 *
+	 * @return array
+	 */
+	public function getArrayCopy()
+	{
+		return get_object_vars($this);
+	}
+	
+	/**
+	 * Populate from an array.
+	 *
+	 * @param array $data
+	 */
+	public function populate($data = array())
+	{
+		if(array_key_exists('id', $data))
+			$this->id = $data['id'];
+		
+		if(array_key_exists('name', $data))
+			$this->name = $data['name'];
+		
+		if(array_key_exists('completed', $data))
+			$this->completed = $data['completed'];
+		 
+		if(array_key_exists('sample', $data))
+			$this->sample = $data['sample'];
+		 
+		if(array_key_exists('notes', $data))
+			$this->notes = $data['notes'];
+		 
+		if(array_key_exists('description', $data))
+			$this->description = $data['description'];
+		 
+		if(array_key_exists('created', $data))
+			$this->created= $data['created'];
+		 
+		if(array_key_exists('sold', $data))
+			$this->sold= $data['sold'];
+		 
+		if(array_key_exists('versions', $data))
+			$this->versions = $data['versions'];
+		
+		if(array_key_exists('genres', $data))
+			$this->genres = $data['genres'];
+		
+		if(array_key_exists('categories', $data))
+			$this->categories = $data['categories'];
+		
+		if(array_key_exists('likes', $data))
+			$this->likes = $data['likes'];
+		
+		if(array_key_exists('albums', $data))
+			$this->albums = $data['albums'];
+		
+		if(array_key_exists('users', $data))
+			$this->users = $data['users'];
+	}
+	
+	public function get(){
+		return $this;
+	}
+	
+	/* Collection */
+	
+	public function hasVersion(SongsVersionHistory $song) {
+		$versions = array();
+		foreach ($this->getVersions() as $arrMember) {
+			$versions[] = $arrMember->getId();
+		}
+		if (in_array($song->getId(), $versions))    //check if the supplied language is to be removed or not
+			return true;
+		else
+			return false;
+	}
+	
+	public function addVersion (SongsVersionHistory $song) {
+		$song->setSongs($this);
+	    $this->versions[] = $song;
+	}
+	
+	
+	
+	
+	public function hasUser (Users $user) {
+		$users = array();
+		foreach ($this->getUsers() as $arrMember) {
+			$users[] = $arrMember->getUsername();
+		}
+		if (in_array($user->getUsername(), $users))    //check if the supplied language is to be removed or not
+			return true;
+	}
+	
+	public function unsetUser (Users $user) {
+		$this->users->removeElement($user);
+		//$user->removeProfileType();
+	}
+	
+	public function setUser (Users $user) {
+		//$user->addProfileType($this);
+		$this->users[] = $user;
+	}
+
+	/* end Languages methods */
+	
 }

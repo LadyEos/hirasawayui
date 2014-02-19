@@ -14,10 +14,11 @@ use Zend\Console\Request;
 class AvatarController extends AbstractActionController
 {
 
-    protected $oMService;
     protected $flag = false;
     protected $uriPaths = array();
-
+    protected $userService;
+    protected $profileService;
+    
     public function indexAction()
     {
         if (! $this->zfcUserAuthentication()->hasIdentity()) {
@@ -34,15 +35,14 @@ class AvatarController extends AbstractActionController
         
         $url = '/images/tmpuploads/';
         
-        $objectManager = $this->getOMService()->getEntityManager();
-        $id = $this->zfcUserAuthentication()->getIdentity()->getId();
-        $user = $objectManager->find('Application\Entity\Users', $id);
+        $user = $this->getUserService()->findAndSetUser($this->zfcUserAuthentication()->getIdentity()->getId());
         
         if ($user->getUserProfile() == null) {
         	return $this->redirect()->toRoute('zfcuser/addprofile');
         }
         
         $profile = $user->getUserProfile();
+        $this->getProfileService()->setProfile($profile);
         
         //$this->_view = new ViewModel();
         $form = new UploadForm('upload-form');
@@ -66,9 +66,7 @@ class AvatarController extends AbstractActionController
 
                 if ($upload->receive()) {
                     $file = $upload->getFileInfo();
-                    $profile->setProfile_picture_url($url.$file['file']['name']);
-                    $objectManager->flush();
-                    
+                    $this->getProfileService()->setProfilePicture($url.$file['file']['name']);
                 } else {
                     $errors = $uploadedFile->getErrors();
                 }
@@ -81,13 +79,22 @@ class AvatarController extends AbstractActionController
             'form' => $form,
         );
     }
-
-    private function getOMService()
+ 
+    private function getUserService()
     {
-        if (! $this->oMService) {
-            $this->oMService = $this->getServiceLocator()->get('Application\Service\DoctrineOMService');
-        }
-        
-        return $this->oMService;
+    	if (!$this->userService) {
+    		$this->userService = $this->getServiceLocator()->get('Application\Service\UserService');
+    	}
+    
+    	return $this->userService;
+    }
+    
+    private function getProfileService()
+    {
+    	if (!$this->profileService) {
+    		$this->profileService = $this->getServiceLocator()->get('Application\Service\ProfileService');
+    	}
+    
+    	return $this->profileService;
     }
 }

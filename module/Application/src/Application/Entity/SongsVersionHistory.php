@@ -10,17 +10,23 @@ class SongsVersionHistory {
 	 */
 	protected $id;
 
-	/** @ORM\Column(type="string", length=300) */
+	/** @ORM\Column(type="string", length=300, nullable=TRUE) */
 	protected $url;
+	
+	/** @ORM\Column(type="string", length=2000,nullable=TRUE) */
+	protected $lyrics;
 
 	/** @ORM\Column(type="datetime") */
 	protected $created;
 
-	/** @ORM\Column(type="string", length=30) */
+	/** @ORM\Column(type="string", length=30, nullable=TRUE) */
 	protected $version;
 	
-	/** @ORM\Column(type="string", length=300) */
+	/** @ORM\Column(type="string", length=300, nullable=TRUE) */
 	protected $comments;
+	
+	/** @ORM\Column(type="string", length=30, nullable=TRUE) */
+	protected $sampletype;
 	
 	/**
 	 * @ORM\ManyToOne(targetEntity="Songs", inversedBy="versions")
@@ -52,6 +58,14 @@ class SongsVersionHistory {
 		$this->url = $url;
 	}
 	
+	public function getLyrics(){
+		return $this->lyrics;
+	}
+	
+	public function setLyrics($lyrics){
+		$this->lyrics = $lyrics;
+	}
+	
 	public function getCreated(){
 		return $this->created;
 	}
@@ -72,6 +86,14 @@ class SongsVersionHistory {
 		$this->comments = $comments;
 	}
 	
+	public function getSampleType(){
+		return $this->sampletype;
+	}
+	
+	public function setSampleType($sampletype){
+		$this->sampletype = $sampletype;
+	}
+	
 	public function getUsers(){
 		return $this->users;
 	}
@@ -86,5 +108,55 @@ class SongsVersionHistory {
 	
 	public function setSongs($songs){
 		$this->songs = $songs;
+	}
+	
+	/**
+	 * Convert the object to an array.
+	 *
+	 * @return array
+	 */
+	public function getArrayCopy()
+	{
+		return get_object_vars($this);
+	}
+	
+	/**
+	 * Populate from an array.
+	 *
+	 * @param array $data
+	 */
+	public function populate($data = array())
+	{
+	    if(array_key_exists('id', $data))
+	       $this->id = $data['id'];
+	    
+	    if(array_key_exists('url', $data))
+		  $this->url = $data['url'];
+	    
+	    if(array_key_exists('lyrics', $data))
+		  $this->lyrics = $data['lyrics'];
+		 
+		if(array_key_exists('created', $data))
+			$this->created = $data['created'];
+		 
+		if(array_key_exists('version', $data))
+			$this->version = $data['version'];
+		 
+		if(array_key_exists('comments', $data))
+			$this->comments = $data['comments'];
+		
+		if(array_key_exists('sampletype', $data))
+			$this->sampletype = $data['sampletype'];
+		 
+		if(array_key_exists('songs', $data))
+			$this->songs= $data['songs'];
+		 
+		if(array_key_exists('users', $data))
+			$this->users= $data['users'];
+
+	}
+	
+	public function get(){
+		return $this;
 	}
 }

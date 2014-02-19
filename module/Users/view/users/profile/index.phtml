@@ -1,0 +1,76 @@
+<?php
+$title = 'Profile homepage';
+$this->headTitle($title);
+$user = $this->zfcUserIdentity()->getId();
+?>
+
+
+<div class="page-header">
+    <h1><?php echo $this->translate($title); ?></h1>
+</div>
+<div class="container">
+<div class="row">
+<div style="float:left; padding-right:16px;">
+<?php 
+//var_dump($this->user);
+if($this->profile->getProfile_picture_url()!=null)
+    echo '<img src="'.$this->profile->getProfile_picture_url().'" height="100px" width="100px"></img>';
+else{
+	if($this->profile->getGravatarEmail()!=null){
+		echo $this->gravatar($this->profile->getGravatarEmail());
+	}else
+	    echo $this->gravatar($this->user->getEmail());
+}
+     ?>
+
+</div>
+<h3><?php 
+
+//$profile = $this->user->getUserProfile(); 
+echo $this->profile->getDisplayname();
+
+
+?></h3>
+<p>
+<?php 
+/**$profarray = $this->profile->getArrayCopy();
+foreach($profarray as $key => $value){
+	if(gettype($value)!="object")
+        echo $key.": ".$value."</br>";
+}
+**/
+?>
+<?php 
+//echo $this->user->getDisplayname().'<br>';
+echo $this->profile->getFirst_name().' '.$this->profile->getLast_name().'<br>';
+echo $this->profile->getBirthdate().'<br>';
+echo $this->profile->getCountry()->getCountry_name().'<br>';
+echo $this->profile->getBiography().'<br>';
+echo $this->profile->getFacebook_link().'<br>';
+echo $this->profile->getTwitter_link().'<br>';
+echo $this->profile->getWebpage().'<br>';
+echo '<hr>';
+echo '<h3>Samples</h3>';
+foreach($this->samples as $song){
+	echo '<a href="'.$this->url('song',array('action'=>'view','id'=>$song->getId())).'">'.$song->getName().
+	'</a> - '.$song->getVersions()->first()->getSampleType().' - '.$song->getVersions()->first()->getCreated()->format('Y-m-d').'<br>';
+}
+echo '<hr>';
+echo '<h3>Projects in progress</h3>';
+foreach($this->projects as $song){
+	echo '<a href="'.$this->url('song',array('action'=>'view','id'=>$song->getId())).'">'.$song->getName().
+	'</a>'.' - '.$song->getVersions()->first()->getCreated()->format('Y-m-d').'<br>';
+}
+echo '<hr>';
+echo '<h3>Finished Projects</h3>';
+foreach($this->finishedProjects as $song){
+	echo '<a href="'.$this->url('song',array('action'=>'view','id'=>$song->getId())).'">'.$song->getName().
+	'</a>'.$song->getVersions()->first()->getCreated()->format('Y-m-d').' - '
+			.'<a href="'.$this->url('song',array('action'=>'view','id'=>$song->getId())).'">Buy</a>'.'<br>';
+}
+?>
+</p>
+
+</div>
+</div>
+

@@ -1,6 +1,8 @@
 <?php
 namespace Application\Entity;
 use Doctrine\ORM\Mapping as ORM;
+use Application\Entity;
+
 /** @ORM\Entity */
 class SongCategories {
 	/**
@@ -23,7 +25,7 @@ class SongCategories {
 	protected $songs;
 	
 	public function __construct() {
-		$this->songs = new \ArrayCollection();
+		$this->songs = new \Doctrine\Common\Collections\ArrayCollection();
 	}
 
 	// getters/setters
@@ -55,5 +57,36 @@ class SongCategories {
 	public function setSongs($songs){
 		$this->songs = $songs;
 	}
+	
+	/* Collection */
+	
+	public function hasSong(Songs $song) {
+		$songs = array();
+		foreach ($this->getSongs() as $arrMember) {
+			$songs[] = $arrMember->getId();
+		}
+		if (in_array($song->getId(), $songs))    //check if the supplied language is to be removed or not
+			return true;
+		else
+			return false;
+	}
+	
+	public function removeSong (Songs $song) {
+		$this->songs->removeElement($song);
+		$song->setCategories(null);
+	}
+	
+	public function addSong (Songs $song) {
+		$song->setCategories($this);
+		$this->songs[] = $song;
+	}
+	
+	public function replaceCategory(Songs $song){
+		if($this->hasSong($song)){
+			$this->removeSong($song);
+			$this->addSong($song);
+		}
+	}
+	/* end Languages methods */
 
 }

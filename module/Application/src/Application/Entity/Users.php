@@ -47,6 +47,7 @@ class Users implements User {
      *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="song_id", referencedColumnName="id")}
      *      )
+     * @ORM\OrderBy({"created" = "DESC"})
      **/
     protected $songs;
     
@@ -335,5 +336,38 @@ class Users implements User {
     }
     /* end Languages methods */
     
-
+    public function countProfileTypes(){
+    	return $this->profile_types->count();
+    }
+    
+    /* Collection Songs */
+    
+    public function hasSongs(Songs $song) {
+    	$songs = array();
+    	foreach ($this->getSongs() as $arrMember) {
+    		$songs[] = $arrMember->getName();
+    	}
+    	if (in_array($song->getName(), $songs))    //check if the supplied language is to be removed or not
+    		return true;
+    	else
+    		return false;
+    }
+    
+    public function removeSong (Songs $song) {
+    	$this->songs->removeElement($song);
+    	$song->unsetUser($this);
+    }
+    
+    public function addSongs (Songs $song) {
+    	$song->setUser($this);
+    	$this->songs[] = $song;
+    }
+    /* end Languages methods */
+    
+    public function countSongs(){
+    	return $this->songs->count();
+    }
+    
+    
+    
 }

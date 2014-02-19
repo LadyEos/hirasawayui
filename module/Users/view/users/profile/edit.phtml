@@ -1,0 +1,113 @@
+<?php 
+echo $this->inlineScript()->prependFile($this->basePath('js/profile.js'));
+//var_dump($this);
+?>
+
+<div class="page-header">
+    <h1><?php echo $this->translate('User Profile'); ?></h1>
+</div>
+
+ <?php
+ 
+$form->prepare();
+//$form->setAttribute('action', 'edit');
+//$form->setAttribute('method', 'post');
+
+ echo $this->form()->openTag($form);
+ 
+ ?>
+    <div class="row">
+  <div id="fields" class="col-md-5">
+ <?php foreach ($form as $element) : ?>
+
+     <div style="width: 330px;" class="form-group <?php if ($this->formElementErrors($element)) echo "has-error" ?> ">
+         <?php
+        
+             
+            if ('submit' != $element->getAttribute('type')) {?>
+                 
+                 <label class="control-label"><?php echo $element->getLabel() ?></label>
+                 <?php
+                 $element->setAttribute('class', 'form-control')
+                         ->setAttribute('placeholder', $element->getLabel());
+                 
+             } else {
+                 $element->setAttribute('class', 'btn btn-success');
+             }
+             if ($element instanceof Zend\Form\Element\Captcha) {
+                 echo $this->formCaptcha($element);
+             } else {
+                 echo $this->formElement($element);
+             }
+             if ($this->formElementErrors($element)) : ?>
+                 <?php
+                 echo $this->formElementErrors()
+                     ->setMessageOpenFormat('<p class="help-block">')
+                     ->setMessageSeparatorString('</p><p class="help-block">')
+                     ->setMessageCloseString('</p>')
+                     ->render($element);
+                 ?>
+             <?php endif; ?>
+     </div>
+  
+ <?php
+endforeach;?>
+    </div>
+    <div style="width: 330px; height: 500px;" class="col-md-5">
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><?php echo $this->translate('Upload your Avatar!') ?></h3>
+            </div>
+            <div class="panel-body">
+                <p><?php echo sprintf($this->translate('If you are not using Gravatar please upload your own avatar and leave gravatar email field blank')) ?></p>
+                <p><a class="btn btn-success pull-right" href="<?php echo $this->url('avatar',array('action'=>'upload'))?>"><?php echo $this->translate('Upload') ?> &raquo;</a></p>
+            </div>
+        </div>
+
+     </div>
+     
+     <div style="width: 330px; height: 500px;" class="col-md-5">
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><?php echo $this->translate('Choose another Role!') ?></h3>
+            </div>
+            <div class="panel-body">
+                <p><?php echo sprintf($this->translate('Choose another role, you currently have this role(s):')) ?></p>
+                <p>
+                    <ul>
+                <?php 
+                    if(isset($this->profileTypes)){
+                        if(sizeof($this->profileTypes) > 0){
+                        foreach ($this->profileTypes as $profile){
+                    	?>
+                        <li><?php echo sprintf($profile->getProfile_name());?></li>                        
+                    
+                    <?php
+                        } }
+                        else
+                        	echo "no roles found";
+                        
+                    }else 
+                        echo "You have no roles yet";
+                
+                ?>
+                </ul></p>
+                <p>
+                <?php if(isset($this->profileTypes)){ 
+                    if(sizeof($this->profileTypes)>1){?>
+                <span style="font-size: 9px">To delete a role click <a href="<?php echo $this->url('zfcuser/deleterole') ?>">here</a></span>
+                <?php }
+                }?>
+                <a class="btn btn-success pull-right" href="<?php echo $this->url('zfcuser/chooserole')?>"><?php echo $this->translate('Add a role!') ?> &raquo;</a></p>
+            </div>
+        </div>
+
+     </div>
+     
+</div>
+
+<?php 
+
+echo $this->form()->closeTag() ?>

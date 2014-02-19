@@ -2,10 +2,11 @@
 return array(
     'controllers' => array(
         'invokables' => array(
-            'Users\Controller\Users' => 'Users\Controller\UsersController',
-            'Users\Controller\Avatars' => 'Users\Controller\AvatarsController'
+            'Users\Controller\Profile' => 'Users\Controller\ProfileController',
+            'Users\Controller\Users' => 'Users\Controller\UsersController'
         )
-    ),
+    )
+    ,
     
     'router' => array(
         'routes' => array(
@@ -26,42 +27,62 @@ return array(
                     
                 )
             ),*/
-            'zfcuser' => array(
+            'profile' => array(
+                'type' => 'Segment',
+                'options' => array(
+                    'route' => '/profile[/][:action][/][user/:id][user/:username]',
+                    'constraints' => array(
+                        'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                        'id' => '[0-9]+',
+                        'username' => '[a-zA-Z][a-zA-Z0-9_-]*'
+                    ),
+                    'defaults' => array(
+                        'controller' => 'Users\Controller\Profile',
+                        'action' => 'index'
+                    )
+                ),
+                /*
                 'child_routes' => array(
-                    'default' => array(
+                    'profiles' => array(
                         'type' => 'Segment',
                         'options' => array(
-                            'route' => '/user[/][:action][/:id]',
+                            'route' => '/profile/user/[:username][/][:id]',
                             'constraints' => array(
-                                'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                                'username' => '[a-zA-Z][a-zA-Z0-9_-]*',
                                 'id' => '[0-9]+'
-                            ),
+                            // 'username' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                                                        ),
                             'defaults' => array(
-                                'controller' => 'Users\Controller\Users',
-                                'action' => 'index'
+                                'controller' => 'Users\Controller\Profile',
+                                'action' => 'profile'
                             )
                         )
-                    ),
-                    'addprofile' => array(
+                    )
+                )*/
+            ),
+            'zfcuser' => array(
+                'child_routes' => array(
+                    
+                    /*'add' => array(
                         'type' => 'Literal',
                         'options' => array(
-                            'route' => '/addprofile',
+                            'route' => '/add',
                             'defaults' => array(
                                 'controller' => 'Users\Controller\Users',
-                                'action' => 'addprofile'
+                                'action' => 'add'
                             )
                         )
                     ),
-                    'editprofile' => array(
+                    'edit' => array(
                         'type' => 'Literal',
                         'options' => array(
-                            'route' => '/editprofile',
+                            'route' => '/edit',
                             'defaults' => array(
                                 'controller' => 'Users\Controller\Users',
-                                'action' => 'editprofile'
+                                'action' => 'edit'
                             )
                         )
-                    ),
+                    ),*/
                     'home' => array(
                         'type' => 'Literal',
                         'options' => array(
@@ -93,46 +114,56 @@ return array(
                         )
                     ),
                     'lyricist' => array(
-                    		'type' => 'Literal',
-                    		'options' => array(
-                    				'route' => '/lyricist',
-                    				'defaults' => array(
-                    						'controller' => 'Users\Controller\Users',
-                    						'action' => 'lyricist'
-                    				)
-                    		)
+                        'type' => 'Literal',
+                        'options' => array(
+                            'route' => '/lyricist',
+                            'defaults' => array(
+                                'controller' => 'Users\Controller\Users',
+                                'action' => 'lyricist'
+                            )
+                        )
                     ),
                     'vocalist' => array(
-                    		'type' => 'Literal',
-                    		'options' => array(
-                    				'route' => '/vocalist',
-                    				'defaults' => array(
-                    						'controller' => 'Users\Controller\Users',
-                    						'action' => 'vocalist'
-                    				)
-                    		)
+                        'type' => 'Literal',
+                        'options' => array(
+                            'route' => '/vocalist',
+                            'defaults' => array(
+                                'controller' => 'Users\Controller\Users',
+                                'action' => 'vocalist'
+                            )
+                        )
                     ),
                     'composer' => array(
-                    		'type' => 'Literal',
-                    		'options' => array(
-                    				'route' => '/composer',
-                    				'defaults' => array(
-                    						'controller' => 'Users\Controller\Users',
-                    						'action' => 'composer'
-                    				)
-                    		)
+                        'type' => 'Literal',
+                        'options' => array(
+                            'route' => '/composer',
+                            'defaults' => array(
+                                'controller' => 'Users\Controller\Users',
+                                'action' => 'composer'
+                            )
+                        )
                     ),
                     'basic' => array(
-                    		'type' => 'Literal',
-                    		'options' => array(
-                    				'route' => '/basic',
-                    				'defaults' => array(
-                    						'controller' => 'Users\Controller\Users',
-                    						'action' => 'basic'
-                    				)
-                    		)
+                        'type' => 'Literal',
+                        'options' => array(
+                            'route' => '/basic',
+                            'defaults' => array(
+                                'controller' => 'Users\Controller\Users',
+                                'action' => 'basic'
+                            )
+                        )
+                    ),
+                    'deleterole' => array(
+                        'type' => 'Literal',
+                        'options' => array(
+                            'route' => '/deleterole',
+                            'defaults' => array(
+                                'controller' => 'Users\Controller\Users',
+                                'action' => 'deleterole'
+                            )
+                        )
                     )
-                ) 
+                )
             )
         )
     ),

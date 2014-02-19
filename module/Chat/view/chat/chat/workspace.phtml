@@ -1,0 +1,55 @@
+<?php
+$title = 'Workspace';
+$this->headTitle($title);
+?>
+
+<div class="page-header">
+    <h1><?php echo $this->translate($title); ?></h1>
+</div>
+<div class="container">
+    <div class="row">
+        <div style="width: 330px; height: 500px;" class="col-md-5">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><?php echo $this->translate('Your current roles are:') ?></h3>
+                </div>
+                <div class="panel-body">
+                    <p>
+                        <ul>
+                            <?php 
+                                if(isset($this->profileTypes)){
+                                    foreach ($this->profileTypes as $profile){
+                            ?>
+                            <li><?php echo sprintf($profile->getProfile_name());?></li>
+                            <?php } 
+                                }else 
+                                    echo "You have no roles yet";
+                            ?>
+                        </ul>
+                    </p>
+                    <p>You can add or change roles <a href="<?php echo $this->url('zfcuser/editprofile');?>">here</a>.</p>
+                </div>
+            </div>
+        </div>
+        <div style="width: 330px; height: 500px;" class="col-md-5">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><?php echo $this->translate('') ?></h3>
+                </div>
+                <div class="panel-body">
+                    <p>
+                        <a href="<?php echo $this->url('zfcuser/addprofile') ?>"><?php echo $this->translate('Profile') ?></a><br>
+                        <a href="<?php echo $this->url('zfcuser/editprofile');?>">Profile</a><br>
+                        <a href="<?php echo $this->url('zfcuser/changepassword')?>"><?php echo $this->translate('Change Password'); ?></a><br>
+                        <a href="<?php echo $this->url('zfcuser/changeemail')?>"><?php echo $this->translate('Change Email'); ?></a>
+                    </p>
+                    <p>
+                        <a href="<?php echo $this->url('zfcuser/logout') ?>">[<?php echo $this->translate('Sign Out'); ?>]</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

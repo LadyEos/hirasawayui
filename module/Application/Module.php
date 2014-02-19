@@ -50,7 +50,12 @@ class Module
                 },
             ),
             'invokables' => array(
-                'Application\Service\AuthService' => 'Application\Service\AuthService'
+                'Application\Service\UserService' => 'Application\Service\UserService',
+                'Application\Service\ProfileService' => 'Application\Service\ProfileService',
+                'Application\Service\ProfileTypeService' => 'Application\Service\ProfileTypeService',
+                'Application\Service\SongService' => 'Application\Service\SongService',
+                'Application\Service\SongCategoriesService' => 'Application\Service\SongCategoriesService',
+                'Application\Service\CountryService' => 'Application\Service\CountryService'
             )
         )
         ;

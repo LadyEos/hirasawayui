@@ -26,10 +26,13 @@ else
 
 ?>!</h3>
 <p>
-	Add <a href="<?php echo $this->url('zfcuser/addprofile') ?>"><?php echo $this->translate('Profile') ?></a>
-	Edit <a href="<?php echo $this->url('zfcuser/editprofile');?>">Profile</a><br>
-     <a href="<?php echo $this->url('zfcuser/changepassword')?>"><?php echo $this->translate('Change Password'); ?></a><br>
-     <a href="<?php echo $this->url('zfcuser/changeemail')?>"><?php echo $this->translate('Change Email'); ?></a>
+	<!--<a href="<?php //echo $this->url('zfcuser/add') ?>"><?php //echo $this->translate('Add Profile') ?></a>
+    <a href="<?php //echo $this->url('zfcuser/edit');?>">Edit Profile</a><br>-->
+    <a href="<?php echo $this->url('profile',array('action'=>'add')); ?>"><?php echo $this->translate('Add Profile'); ?></a><br>
+    <a href="<?php echo $this->url('profile',array('action'=>'edit'));?>">Edit Profile</a><br>
+    <a href="<?php echo $this->url('profile');?>">Public Profile</a><br>
+    <a href="<?php echo $this->url('zfcuser/changepassword')?>"><?php echo $this->translate('Change Password'); ?></a><br>
+    <a href="<?php echo $this->url('zfcuser/changeemail')?>"><?php echo $this->translate('Change Email'); ?></a>
 
  
 </p>

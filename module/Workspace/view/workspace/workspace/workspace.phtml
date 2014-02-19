@@ -1,0 +1,75 @@
+<?php
+$title = 'Workspace';
+$this->headTitle($title);
+?>
+
+<div class="page-header">
+    <h1><?php echo $this->translate($title); ?></h1>
+</div>
+<div class="container">
+    <div class="row">
+        <div style="width: 330px; height: 500px;" class="col-md-5">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><?php echo $this->translate('Your current roles are:') ?></h3>
+                </div>
+                <div class="panel-body">
+                    <p>
+                        <ul>
+                            <?php 
+                                if(isset($this->profileTypes)){
+                                    foreach ($this->profileTypes as $profile){
+                            ?>
+                            <li><?php echo sprintf($profile->getProfile_name());?></li>
+                            <?php } 
+                                }else 
+                                    echo "You have no roles yet";
+                            ?>
+                        </ul>
+                    </p>
+                    <p>You can add or change roles <a href="<?php echo $this->url('profile',array('action'=>'edit'));?>">here</a>.</p>
+                </div>
+            </div>
+        </div>
+        <div style="width: 330px; height: 500px;" class="col-md-5">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><?php echo $this->translate('') ?></h3>
+                </div>
+                <div class="panel-body">
+                    <p>
+                        <?php 
+                            if(isset($this->profileTypes)){
+                                foreach ($this->profileTypes as $profile){
+                                    if($profile->getProfile_key()=='PLy'){
+                        ?>
+                        <a href="<?php echo $this->url('song',array('action'=>'uploadlyrics')) ?>"><?php echo $this->translate('upload sample Lyrics') ?></a><br>
+                        <?php 
+                            }
+                            if($profile->getProfile_key()=='PVo'){
+                        ?>
+                        <a href="<?php echo $this->url('song',array('action'=>'upload','type'=>'sample','name'=>'vocal')) ?>"><?php echo $this->translate('upload sample Vocal') ?></a><br>
+                        <?php
+                             } 
+                             if($profile->getProfile_key()=='PCo'){
+                        ?>
+                        <a href="<?php echo $this->url('song',array('action'=>'upload','type'=>'sample','name'=>'score')) ?>"><?php echo $this->translate('upload sample Score') ?></a><br>
+                        <?php 
+                                    }
+                                } 
+                            }else 
+                                echo "You have no roles yet";
+                        ?>
+                        
+                        
+                        </p>
+                    <p>
+                        <a href="<?php echo $this->url('song',array('action'=>'upload')) ?>"><?php echo $this->translate('upload something basic') ?></a><br>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
