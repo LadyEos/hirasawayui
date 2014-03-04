@@ -8,10 +8,10 @@ use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use Doctrine\ORM\EntityManager; // \ObjectManager;
 use DoctrineModule\Stdlib\Hydrator\DoctrineObject as DoctrineHydrator;
 
-class UploadForm extends Form // implements ObjectManagerAwareInterface
+class LyricsForm extends Form // implements ObjectManagerAwareInterface
 {
 
-    public function __construct($name = null, $sm, $sample)
+    public function __construct($name = null,$sm)
     {
         // we want to ignore the name passed
         // $this->setObjectManager($objectManager);
@@ -29,43 +29,47 @@ class UploadForm extends Form // implements ObjectManagerAwareInterface
                 'label' => 'Version Number'
             )
         ));
-        
-        $file = new Element\File('file');
-        $file->setLabel('File Input')->setAttributes(array(
-            'id' => 'file'
-        ));
-        $this->add($file);
-        
         $this->add(array(
-            'name' => 'comments', // 'usr_name',
-            'attributes' => array(
-                'type' => 'textarea'
-            ),
-            'options' => array(
-                'label' => 'Version Comments'
-            )
+        		'name' => 'lyrics', // 'usr_name',
+        		'attributes' => array(
+        				'type' => 'textarea'
+        		),
+        		'options' => array(
+        				'label' => 'Lyrics'
+        		)
+        ));
+        $this->add(array(
+        		'name' => 'comments', // 'usr_name',
+        		'attributes' => array(
+        				'type' => 'textarea'
+        		),
+        		'options' => array(
+        				'label' => 'Version Comments'
+        		)
         ));
         
         /* if (! $sample) {
-            $radio = new Element\Radio('lyrics');
-            $radio->setLabel('Add lyrics?');
-            $radio->setValueOptions(array(
-                '0' => 'don\'t add any lyrics',
-                '1' => 'add to this version',
-                '2' => 'add in another version'
-            ));
-            $radio->setValue('0');
-            
-            $this->add($radio);
+        	$radio = new Element\Radio('audio');
+        	$radio->setLabel('Add audio/voice track?');
+        	$radio->setValueOptions(array(
+        			'0' => 'don\'t add any audio',
+        			'1' => 'add to this version',
+        			'2' => 'add in another version'
+        	));
+        	$radio->setValue('0');
+        
+        	$this->add($radio);
         } */
         
         $this->add(array(
             'name' => 'submit',
             'attributes' => array(
                 'type' => 'submit',
-                'value' => 'Upload',
+                'value' => 'Submit',
                 'id' => 'submitbutton'
             )
         ));
     }
+
+   
 }

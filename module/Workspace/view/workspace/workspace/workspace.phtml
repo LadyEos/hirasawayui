@@ -43,17 +43,17 @@ $this->headTitle($title);
                                 foreach ($this->profileTypes as $profile){
                                     if($profile->getProfile_key()=='PLy'){
                         ?>
-                        <a href="<?php echo $this->url('song',array('action'=>'uploadlyrics')) ?>"><?php echo $this->translate('upload sample Lyrics') ?></a><br>
+                        <a href="<?php echo $this->url('song',array('action'=>'add','type'=>'sample','name'=>'lyrics')) ?>"><?php echo $this->translate('upload sample Lyrics') ?></a><br>
                         <?php 
                             }
                             if($profile->getProfile_key()=='PVo'){
                         ?>
-                        <a href="<?php echo $this->url('song',array('action'=>'upload','type'=>'sample','name'=>'vocal')) ?>"><?php echo $this->translate('upload sample Vocal') ?></a><br>
+                        <a href="<?php echo $this->url('song',array('action'=>'add','type'=>'sample','name'=>'vocal')) ?>"><?php echo $this->translate('upload sample Vocal') ?></a><br>
                         <?php
                              } 
                              if($profile->getProfile_key()=='PCo'){
                         ?>
-                        <a href="<?php echo $this->url('song',array('action'=>'upload','type'=>'sample','name'=>'score')) ?>"><?php echo $this->translate('upload sample Score') ?></a><br>
+                        <a href="<?php echo $this->url('song',array('action'=>'add','type'=>'sample','name'=>'score')) ?>"><?php echo $this->translate('upload sample Score') ?></a><br>
                         <?php 
                                     }
                                 } 
@@ -64,7 +64,45 @@ $this->headTitle($title);
                         
                         </p>
                     <p>
-                        <a href="<?php echo $this->url('song',array('action'=>'upload')) ?>"><?php echo $this->translate('upload something basic') ?></a><br>
+                        <a href="<?php echo $this->url('song',array('action'=>'add')) ?>"><?php echo $this->translate('single author project (audio)') ?></a><br>
+                        <a href="<?php echo $this->url('song',array('action'=>'add','name'=>'lyrics')) ?>"><?php echo $this->translate('single author project (lyrics)') ?></a><br>
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div style="width: 330px; height: 500px;" class="col-md-5">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><?php echo $this->translate('Projects') ?></h3>
+                </div>
+                <div class="panel-body">
+                    <p>
+                        <?php echo '<h3>Samples</h3>';
+
+                        foreach($this->samples as $song){
+                        	echo '<a href="'.$this->url('song',array('action'=>'view','id'=>$song->getId())).'">'.$song->getName().
+                        	'</a> - '.$song->getSampleType().' - '.$song->getVersions()->first()->getCreated()->format('Y-m-d').
+                        	' - <a href="'.$this->url('song',array('action'=>'edit','id'=>$song->getId())).'">Edit</a>'.
+                        	' - <a href="'.$this->url('version',array('action'=>'add','id'=>$song->getId())).'">Add Version</a>'.
+                        	'<br>';
+                        }
+                        echo '<hr>';
+                        echo '<h3>Projects in progress</h3>';
+                        foreach($this->projects as $song){
+                        	echo '<a href="'.$this->url('song',array('action'=>'view','id'=>$song->getId())).'">'.$song->getName().
+                        	'</a>'.' - '.$song->getVersions()->first()->getCreated()->format('Y-m-d').
+                        	' - <a href="'.$this->url('song',array('action'=>'edit','id'=>$song->getId())).'">Edit</a>'.
+                        	' - <a href="'.$this->url('version',array('action'=>'add','id'=>$song->getId())).'">Add Version</a>'.'<br>';
+                        }
+                        echo '<hr>';
+                        echo '<h3>Finished Projects</h3>';
+                        foreach($this->finishedProjects as $song){
+                        	echo '<a href="'.$this->url('song',array('action'=>'view','id'=>$song->getId())).'">'.$song->getName().
+                        	'</a>'.$song->getVersions()->first()->getCreated()->format('Y-m-d').' - '
+                        			.'<a href="'.$this->url('song',array('action'=>'view','id'=>$song->getId())).'">Buy</a>'.'<br>';
+                        }
+                        ?>
                     </p>
                 </div>
             </div>

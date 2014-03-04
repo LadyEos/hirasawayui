@@ -24,6 +24,12 @@ class Songs {
 	
 	/** @ORM\Column(type="string", length=300) */
 	protected $description;
+	
+	/** @ORM\Column(type="string", length=30, nullable=TRUE) */
+	protected $sampletype;
+	
+	/** @ORM\Column(type="boolean", length=1) */
+	protected $active;
 
 	/** @ORM\Column(type="datetime") */
 	protected $created;
@@ -34,7 +40,7 @@ class Songs {
 	protected $sold;
 	
 	/**
-	 * @ORM\OneToMany(targetEntity="SongsVersionHistory", mappedBy="songs")
+	 * @ORM\OneToMany(targetEntity="SongsVersionHistory", mappedBy="song", cascade={"persist", "remove"})
 	 * @ORM\OrderBy({"created" = "DESC"})
 	 **/
 	protected $versions;
@@ -43,7 +49,7 @@ class Songs {
 	 * @ORM\ManyToOne(targetEntity="Genres", inversedBy="songs")
 	 * @ORM\JoinColumn(name="genre_id", referencedColumnName="id")
 	 **/
-	protected $genres;
+	protected $genre;
 	
 	/**
 	 * @ORM\ManyToOne(targetEntity="SongCategories", inversedBy="songs")
@@ -58,7 +64,7 @@ class Songs {
 	
 	/**
 	 * @ORM\ManyToOne(targetEntity="Albums", inversedBy="songs")
-	 * @ORM\JoinColumn(name="song_id", referencedColumnName="id")
+	 * @ORM\JoinColumn(name="album_id", referencedColumnName="id")
 	 **/
 	protected $albums;
 	
@@ -70,7 +76,7 @@ class Songs {
 
 	public function __construct(){
 		$this->created = new \DateTime();
-		$this->activated = FALSE;
+		$this->activate = TRUE;
 		$this->sold = new \Doctrine\Common\Collections\ArrayCollection();
 		$this->versions = new \Doctrine\Common\Collections\ArrayCollection();
 		$this->likes = new \Doctrine\Common\Collections\ArrayCollection();
@@ -127,12 +133,12 @@ class Songs {
 		return $this->created;
 	}
 	
-	public function getGenres(){
-		return $this->genres;
+	public function getGenre(){
+		return $this->genre;
 	}
 	
-	public function setGenres($genres){
-		$this->genres = $genres;
+	public function setGenre($genre){
+		$this->genre = $genre;
 	}
 	
 	public function getCategories(){
@@ -177,6 +183,22 @@ class Songs {
 	
 	public function getUsers(){
 		return $this->users;
+	}
+	
+	public function getSampleType(){
+		return $this->sampletype;
+	}
+	
+	public function setSampleType($sampletype){
+		$this->sampletype = $sampletype;
+	}
+	
+	public function getActive(){
+		return $this->active;
+	}
+	
+	public function setActive($active){
+		$this->active = $active;
 	}
 	
 	
@@ -224,8 +246,8 @@ class Songs {
 		if(array_key_exists('versions', $data))
 			$this->versions = $data['versions'];
 		
-		if(array_key_exists('genres', $data))
-			$this->genres = $data['genres'];
+		if(array_key_exists('genre', $data))
+			$this->genre = $data['genre'];
 		
 		if(array_key_exists('categories', $data))
 			$this->categories = $data['categories'];
@@ -238,6 +260,12 @@ class Songs {
 		
 		if(array_key_exists('users', $data))
 			$this->users = $data['users'];
+		
+		if(array_key_exists('active', $data))
+			$this->active = $data['active'];
+		
+		if(array_key_exists('sampletype', $data))
+			$this->sampletype = $data['sampletype'];
 	}
 	
 	public function get(){
@@ -257,9 +285,9 @@ class Songs {
 			return false;
 	}
 	
-	public function addVersion (SongsVersionHistory $song) {
-		$song->setSongs($this);
-	    $this->versions[] = $song;
+	public function addVersion (SongsVersionHistory $version) {
+		$version->setSong($this);
+	    $this->versions[] = $version;
 	}
 	
 	
@@ -276,11 +304,9 @@ class Songs {
 	
 	public function unsetUser (Users $user) {
 		$this->users->removeElement($user);
-		//$user->removeProfileType();
 	}
 	
 	public function setUser (Users $user) {
-		//$user->addProfileType($this);
 		$this->users[] = $user;
 	}
 

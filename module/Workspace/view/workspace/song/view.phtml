@@ -1,8 +1,13 @@
 <?php echo $this->inlineScript()->prependFile($this->basePath('js/musicplayer.js')); ?>
 <?php
-$title = $this->song->getName();
+
+if(isset($this->version)){
+	$version = $this->version;
+}else
+    $version = $this->song->getVersions()->first();
+
+$title = $this->song->getName().' ver. '.$version->getVersion();
 $this->headTitle($title);
-$version = $this->song->getVersions()->first();
 ?>
 <h1><?php echo $this->escapeHtml($title); ?></h1>
 
@@ -55,7 +60,7 @@ $version = $this->song->getVersions()->first();
 <?php endif;?>
 </div>
 
-
+<br>
 
 <div id="lyricsWrapper">
     <?php if($version->getLyrics()!=null):?>
@@ -77,14 +82,28 @@ $version = $this->song->getVersions()->first();
 </div>
 <div id="authorWrapper">
     <?php
-    if (isset($this->author)){?>
-    <a
-    	href="<?php echo $this->url('song',array('action'=>'edit','id'=>$this->song->getId())) ?>">
+    if (isset($this->author)){
+
+        if($this->song->getCompleted() == 0 || $this->song->getSample() == 1){
+
+?>
+    
+    <a href="<?php echo $this->url('song',array('action'=>'edit','id'=>$this->song->getId())) ?>">
         <?php echo $this->translate('Edit') ?></a>
-    <a
-    	href="<?php echo $this->url('song',array('action'=>'delete','id'=>$this->song->getId())) ?>">
+        
+        <?php }
+        if($this->song->getSample() == 0 && $this->song->getCompleted()==0){?>
+        <a href="<?php echo $this->url('version',array('action'=>'add','id'=>$this->song->getId())) ?>">
+        <?php echo $this->translate('Add Version') ?></a>
+        <?php }?>
+        <a href="<?php echo $this->url('song',array('action'=>'delete','id'=>$this->song->getId())) ?>">
         <?php echo $this->translate('Delete') ?></a>
-    <?php }?>
+        <?php if($this->song->getVersions()->count() > 1){?>
+        <a href="<?php echo $this->url('version',array('action'=>'past','id'=>$this->song->getId())) ?>">
+        <?php echo $this->translate('View previous versions') ?></a>
+        
+    <?php   }
+        }?>
     <br>
     <br>
 </div>

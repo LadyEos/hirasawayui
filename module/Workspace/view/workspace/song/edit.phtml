@@ -1,0 +1,86 @@
+<?php echo $this->inlineScript()->prependFile($this->basePath('js/musicplayer.js')); ?>
+<?php //var_dump($this->song)?>
+<?php
+$title = $this->song->getName();
+$this->headTitle($title);
+$version = $this->song->getVersions()->first();
+?>
+<h1><?php echo $this->escapeHtml($title); ?></h1>
+<?php 
+$form->prepare();
+
+ echo $this->form()->openTag($form);
+ 
+ ?>
+ <div class="row">
+  <div id="fields" class="col-md-5">
+ <?php foreach ($form as $element) : ?>
+
+     <div style="width: 330px;" class="form-group <?php if ($this->formElementErrors($element)) echo "has-error" ?>">
+         <?php
+        
+             
+            if('file' == $element->getAttribute('type')){?>
+                          <label class="control-label"><?php echo $element->getLabel() ?></label>
+            <?php }else if('checkbox' == $element->getAttribute('type')){ ?>
+                
+                <label  class="control-label"><?php echo $element->getLabel(); ?></label>   
+       
+                             
+            <?php } else if ('submit' != $element->getAttribute('type')) { ?>
+                 <label class="control-label"><?php echo $element->getLabel() ?></label>
+                 <?php
+                 $element->setAttribute('class', 'form-control')
+                         ->setAttribute('placeholder', $element->getLabel());
+             } 
+             else {
+                 $element->setAttribute('class', 'btn btn-success');
+             }
+             
+             if('checkbox' != $element->getAttribute('type') || 'radio' != $element->getAttribute('type'))
+                echo $this->formElement($element);
+             
+             if ($this->formElementErrors($element)) : ?>
+                 <?php
+                 echo $this->formElementErrors()
+                     ->setMessageOpenFormat('<p class="help-block">')
+                     ->setMessageSeparatorString('</p><p class="help-block">')
+                     ->setMessageCloseString('</p>')
+                     ->render($element);
+                 ?>
+             <?php endif; ?>
+     </div>
+  
+ <?php
+endforeach;
+echo $this->form()->closeTag() ?>
+
+</div>
+<div style="width: 330px; height: 500px;" class="col-md-5">
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><?php echo $this->translate('Upload New Version') ?></h3>
+            </div>
+            <div class="panel-body">
+                <p><?php echo sprintf($this->translate('If you want to upload a new version of this audio file please click here!, the older versions will only be available to you')) ?></p>
+                <p><a class="btn btn-success pull-right" href="<?php echo $this->url('version',array('action'=>'add','id'=>$this->song->getId()))?>"><?php echo $this->translate('New Version') ?> &raquo;</a></p>
+            </div>
+        </div>
+
+     </div>
+
+<div style="width: 330px; height: 500px;" class="col-md-5">
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><?php echo $this->translate('Collaborate!') ?></h3>
+            </div>
+            <div class="panel-body">
+                <p><?php echo sprintf($this->translate('add people to help you!')) ?></p>
+                <p><a class="btn btn-success pull-right" href="<?php echo $this->url('song',array('action'=>'upload'))?>"><?php echo $this->translate('Collaborate') ?> &raquo;</a></p>
+            </div>
+        </div>
+     </div>
+</div>
+

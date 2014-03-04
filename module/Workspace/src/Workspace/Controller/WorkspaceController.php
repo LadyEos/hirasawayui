@@ -37,8 +37,15 @@ class WorkspaceController extends AbstractActionController
         
         $this->_view = new ViewModel();
         $profileTypes = $user->getProfile_types()->toArray();
-        
+        $sampleSongs =  $this->getUserService()->getSampleSongs();
+        $projects= $this->getUserService()->getProjects();
+        $finishedProjects= $this->getUserService()->getFinishedProjects();
+         
         $this->_view->setVariable('profileTypes', $profileTypes);
+        $this->_view->setVariable('samples',$sampleSongs);
+        $this->_view->setVariable('projects', $projects);
+        $this->_view->setVariable('finishedProjects', $finishedProjects);
+        
         return $this->_view;
     }
 

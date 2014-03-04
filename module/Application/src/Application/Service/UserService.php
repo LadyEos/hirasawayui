@@ -10,6 +10,7 @@ use Application\Entity\Countries;
 class UserService implements ServiceLocatorAwareInterface{
     
     protected $profileService;
+    protected $profileTypeService;
     protected $em;
     protected $user;
     protected $entity = 'Application\Entity\Users';
@@ -70,6 +71,7 @@ class UserService implements ServiceLocatorAwareInterface{
     public function saveUser($data){
     	
     }
+    
     
     public function removeProfileType($profileType){
         $objectManager = $this->getOMService()->getEntityManager();

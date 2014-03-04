@@ -25,17 +25,14 @@ class SongsVersionHistory {
 	/** @ORM\Column(type="string", length=300, nullable=TRUE) */
 	protected $comments;
 	
-	/** @ORM\Column(type="string", length=30, nullable=TRUE) */
-	protected $sampletype;
-	
 	/**
-	 * @ORM\ManyToOne(targetEntity="Songs", inversedBy="versions")
+	 * @ORM\ManyToOne(targetEntity="Songs", inversedBy="versions", cascade={"persist", "remove"})
 	 * @ORM\JoinColumn(name="song_id", referencedColumnName="id")
 	 **/
-	protected $songs;
+	protected $song;
 	
 	/**
-	 * @ORM\ManyToOne(targetEntity="Users", inversedBy="versions")
+	 * @ORM\ManyToOne(targetEntity="Users", inversedBy="versions", cascade={"detach"})
 	 * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
 	 **/
 	protected $users;
@@ -86,14 +83,6 @@ class SongsVersionHistory {
 		$this->comments = $comments;
 	}
 	
-	public function getSampleType(){
-		return $this->sampletype;
-	}
-	
-	public function setSampleType($sampletype){
-		$this->sampletype = $sampletype;
-	}
-	
 	public function getUsers(){
 		return $this->users;
 	}
@@ -102,12 +91,13 @@ class SongsVersionHistory {
 		$this->users = $users;
 	}
 	
-	public function getSongs(){
-		return $this->songs;
+	public function getSong(){
+		return $this->song;
 	}
 	
-	public function setSongs($songs){
-		$this->songs = $songs;
+	public function setSong($song){
+		$this->song = $song;
+		//$this->song->addVersion($this);
 	}
 	
 	/**
@@ -144,16 +134,6 @@ class SongsVersionHistory {
 		 
 		if(array_key_exists('comments', $data))
 			$this->comments = $data['comments'];
-		
-		if(array_key_exists('sampletype', $data))
-			$this->sampletype = $data['sampletype'];
-		 
-		if(array_key_exists('songs', $data))
-			$this->songs= $data['songs'];
-		 
-		if(array_key_exists('users', $data))
-			$this->users= $data['users'];
-
 	}
 	
 	public function get(){

@@ -3,23 +3,23 @@ namespace Workspace\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
-use Doctrine\ORM\EntityManager;
-use Application\Entity\Users;
-use Workspace\Form\SampleForm;
-use Workspace\Form\SampleFilter;
-use Workspace\Form\UploadFilter;
-use Workspace\Form\UploadForm;
-use Workspace\Form\SampleLyricsForm;
-use Workspace\Form\SampleLyricsFilter;
-use Application\Entity;
 use Application\Entity\SongsVersionHistory;
 use Application\Entity\Songs;
 use Zend\File\Transfer\Adapter\Http;
+use Zend\Session\Container;
+
+use Workspace\Form\SongForm;
+use Workspace\Form\SongFilter;
+use Workspace\Form\UploadFilter;
+use Workspace\Form\UploadForm;
+use Workspace\Form\LyricsFilter;
+use Workspace\Form\LyricsForm;
 
 class SongController extends AbstractActionController
 {
 
     protected $songService;
+    protected $songVersionHistoryService;
     protected $userService;
 
     public function indexAction()
@@ -37,7 +37,9 @@ class SongController extends AbstractActionController
 
         $id = $this->params()->fromRoute('id');
         
-        $song = $this->getSongService()->findSong($id);
+        $oid = $this->params()->fromRoute('oid');
+        
+        $song = $this->getSongService()->find($id);
 
         $user = $this->getUserService()->findAndSetUser($this->zfcUserAuthentication()->getIdentity()->getId());
         
@@ -46,6 +48,11 @@ class SongController extends AbstractActionController
         }
         
         $this->_view->setVariable('song', $song);
+        if($oid != null){
+        	$version = $this->getSongVersionHistoryService()->find($oid);
+            $this->_view->setVariable('version', $version);
+        }
+            
         
         return $this->_view;
         
@@ -58,6 +65,35 @@ class SongController extends AbstractActionController
         }
                
         $id = $this->params()->fromRoute('id');
+         
+        $user = $this->getUserService()->findAndSetUser($this->zfcUserAuthentication()->getIdentity()->getId());
+        $song = $this->getSongService()->find($id);
+        //$this->_view->setVariable('song', $song);
+        
+        if($song->getCompleted() == 1){
+        	//echo 'song marked as complete';
+        	return $this->redirect()->toRoute('song',array('action'=>'view','id'=>$song->getId()));
+        }
+        
+        $form = new SongForm('Song', $this->getServiceLocator());
+        
+        $form->setBindOnValidate(false);
+        $form->bind($song);
+       
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+        
+        	$form->setInputFilter(new UploadFilter($this->getServiceLocator()));
+        
+        	if ($form->isValid()) {
+                $song = $this->getSongService()->create($data,$user,$sample,$file,$url); 		
+        		return $this->redirect()->toRoute('workspace',array('action'=>'workspace'));
+        	}
+        }
+        return array(
+        		'form' => $form,
+                'song' => $song
+        );
     }
     
     public function deleteAction(){
@@ -70,6 +106,56 @@ class SongController extends AbstractActionController
         
         $id = $this->params()->fromRoute('id');
     }
+    
+    public function addAction(){
+        if (! $this->zfcUserAuthentication()->hasIdentity()) {
+        	return $this->redirect()->toRoute(static::ROUTE_LOGIN);
+        }
+         
+        $user = $this->getUserService()->findAndSetUser($this->zfcUserAuthentication()->getIdentity()->getId());
+         
+        $name = $this->params()->fromRoute('name');
+        $sample = $this->params()->fromRoute('type');
+
+        //$this->getServiceLocator()->get('Zend\Log')->info($sample.' '.$name);
+        
+        if($sample != null ){
+            $sample = true;
+        }else{
+        	$sample = false;
+        	
+        }
+        
+        $form = new SongForm('Song', $this->getServiceLocator(),$sample,$name);
+        
+        $request = $this->getRequest();
+        if ($request->isPost()) {       
+        	
+            $form->setInputFilter(new SongFilter($this->getServiceLocator()));
+        	$form->setData($request->getPost());
+        	
+        	if ($form->isValid()) {  
+        	   $data = $form->getData();
+        	    
+        	   $this->getServiceLocator()->get('Zend\Log')->info($form->getData());
+        	   $song = $this->getSongService()->create($data,$user,$sample);
+        		
+        	   $session = new Container('Songs');
+        	   $session->song = $song;
+        	   $session->sample = $sample;
+        	   
+        	   if(isset($data['sampletype'])){
+        	       if($data['sampletype'] == 'lyrics')
+        	           return $this->redirect()->toRoute('song',array('action'=>'lyrics'));
+        	   }
+        	   
+        	   return $this->redirect()->toRoute('song',array('action'=>'upload'));
+        	}
+        }
+        return array(
+        		'form' => $form
+        );
+    }
   
     public function uploadAction()
     {
@@ -77,22 +163,26 @@ class SongController extends AbstractActionController
     		return $this->redirect()->toRoute(static::ROUTE_LOGIN);
     	}
     	$tempFile = null;
+    	$errors = null;
+    	$id= $this->zfcUserAuthentication()->getIdentity()->getId();
+    	$user = $this->getUserService()->findAndSetUser($id);
     	
-    	$user = $this->getUserService()->findAndSetUser($this->zfcUserAuthentication()->getIdentity()->getId());
-    	
-    	$name = $this->params()->fromRoute('name');
-    	$sample = $this->params()->fromRoute('type');
+    	$session = new Container('Songs');
+    	$song = $session->song;
+    	$sample = $session->sample;
 
-    	if($sample != null){
+    	//$song = $this->getSongService()->find($songId);
+    	
+    	if($sample == 1){
     	   $url = '/samples/';
     	   $filename = 'sample';
-    	   $form = new SampleForm('Sample', $this->getServiceLocator(),$name);
+    	   //$form = new UploadForm('Sample', $this->getServiceLocator(),$sample);
     	}else{
             $url = '/works/';
             $filename = 'file';
-            $form = new UploadForm('Upload', $this->getServiceLocator());
+            //$form = new UploadForm('Upload', $this->getServiceLocator(),$sample);
     	}
-    	
+    	$form = new UploadForm('Sample', $this->getServiceLocator(),$sample);
     
     	$upload = new \Zend\File\Transfer\Transfer();
     	$upload->setDestination('./public/uploads'.$url);
@@ -104,13 +194,8 @@ class SongController extends AbstractActionController
     
     	$request = $this->getRequest();
     	if ($request->isPost()) {
-    		
-    	    if($sample != null){
-    	    	$form->setInputFilter(new SampleFilter($this->getServiceLocator()));
-    	    }else{
-    	    	$form->setInputFilter(new UploadFilter($this->getServiceLocator()));
-    	    }
-
+    	
+    	    $form->setInputFilter(new UploadFilter($this->getServiceLocator()));
     		$data = array_merge_recursive($this->getRequest()->getPost()->toArray(), 
     		    $this->getRequest()->getFiles()->toArray());
     		$form->setData($data);
@@ -121,17 +206,17 @@ class SongController extends AbstractActionController
     			    
     				$file = $upload->getFileInfo();
     				
-    				$song = $this->getSongService()->saveSong($data,$user,$sample,$file,$url);
+    				$version = $this->getSongVersionHistoryService()->create($data,$id,$song->getId(),$file,$url);
     				
-    				
+    				return $this->redirect()->toRoute('workspace',array('action'=>'workspace'));
     			} else {
-    				$errors = $uploadedFile->getErrors();
+    				$errors = $upload->getErrors();
     			}
-    			return $this->redirect()->toRoute('workspace',array('action'=>'workspace'));
+    			
     		} else {
     			// Form not valid, but file uploads might be valid...
     			// Get the temporary file information to show the user in the view
-    			$fileErrors = $form->get('file')->getMessages();
+    		    $fileErrors = $form->get('file')->getMessages();
     			if (empty($fileErrors)) {
     				$tempFile = $form->get('file')->getValue();
     			}
@@ -140,36 +225,44 @@ class SongController extends AbstractActionController
     	return array(
     			'form' => $form,
     			'tempFile' => $tempFile,
+    	       'errors'=>$errors,
+    	       'song' => $song
     	);
     }
     
-    public function uploadlyricsAction()
+    public function lyricsAction()
     {
     	if (! $this->zfcUserAuthentication()->hasIdentity()) {
     		return $this->redirect()->toRoute(static::ROUTE_LOGIN);
     	}
-    
-    	$user = $this->getUserService()->findAndSetUser($this->zfcUserAuthentication()->getIdentity()->getId());
-    	 
-    	$name ='lyrics';
-    	$sample = 'sample';
-    	 
-    	$form = new SampleLyricsForm('Sample', $this->getServiceLocator());
+
+    	$id= $this->zfcUserAuthentication()->getIdentity()->getId();
+    	//$user = $this->getUserService()->findAndSetUser($id);
+    	
+    	$session = new Container('Songs');
+    	$song = $session->song;
+    	$sample = $session->sample;
+
+   
+    	$form = new LyricsForm('Lyrics', $this->getServiceLocator());
+    	
     
     	$request = $this->getRequest();
     	if ($request->isPost()) {
-    		$form->setInputFilter(new SampleLyricsFilter($this->getServiceLocator()));
+    	    
+    	    $form->setInputFilter(new LyricsFilter($this->getServiceLocator()));
     		$form->setData($request->getPost());
+    
     		if ($form->isValid()) {
-    			$data = $form->getData();
-    			
-    			$song = $this->getSongService()->saveSong($data,$user,$sample);
-    			
+    		    $data = $form->getData();
+    			$version = $this->getSongVersionHistoryService()->create($data,$id,$song->getId());
+
     			return $this->redirect()->toRoute('workspace',array('action'=>'workspace'));
     		}
     	}
     	return array(
-    			'form' => $form
+    		'form' => $form,
+    	    'song' => $song
     	);
     }
     
@@ -180,6 +273,15 @@ class SongController extends AbstractActionController
     	}
     
     	return $this->songService;
+    }
+    
+    private function getSongVersionHistoryService()
+    {
+    	if (!$this->songVersionHistoryService) {
+    		$this->songVersionHistoryService = $this->getServiceLocator()->get('Application\Service\SongVersionHistoryService');
+    	}
+    
+    	return $this->songVersionHistoryService;
     }
 
     private function getUserService()

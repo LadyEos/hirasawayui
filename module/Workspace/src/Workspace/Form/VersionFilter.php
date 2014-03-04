@@ -5,7 +5,7 @@ use Zend\InputFilter\Factory as InputFactory;
 use Zend\InputFilter\InputFilter;
 use Zend\InputFilter\InputFilterProviderInterface;
 
-class UploadFilter extends InputFilter
+class VersionFilter extends InputFilter
 {
 
     public function __construct($sm)
@@ -70,6 +70,30 @@ class UploadFilter extends InputFilter
         				)
         		)
         ));
+        
+        $this->add(array(
+        		'name' => 'lyrics',
+        		'required' => false,
+        		'filters' => array(
+        				array(
+        						'name' => 'StripTags'
+        				),
+        				array(
+        						'name' => 'StringTrim'
+        				)
+        		),
+        		'validators' => array(
+        				array(
+        						'name' => 'StringLength',
+        						'options' => array(
+        								'encoding' => 'UTF-8',
+        								'min' => 1,
+        								'max' => 2000
+        						)
+        				)
+        		)
+        ));
+        
         
       
     }

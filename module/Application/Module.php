@@ -55,7 +55,8 @@ class Module
                 'Application\Service\ProfileTypeService' => 'Application\Service\ProfileTypeService',
                 'Application\Service\SongService' => 'Application\Service\SongService',
                 'Application\Service\SongCategoriesService' => 'Application\Service\SongCategoriesService',
-                'Application\Service\CountryService' => 'Application\Service\CountryService'
+                'Application\Service\CountryService' => 'Application\Service\CountryService',
+                'Application\Service\SongVersionHistoryService' => 'Application\Service\SongVersionHistoryService'
             )
         )
         ;

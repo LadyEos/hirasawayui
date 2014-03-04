@@ -51,9 +51,10 @@ echo $this->profile->getTwitter_link().'<br>';
 echo $this->profile->getWebpage().'<br>';
 echo '<hr>';
 echo '<h3>Samples</h3>';
+
 foreach($this->samples as $song){
 	echo '<a href="'.$this->url('song',array('action'=>'view','id'=>$song->getId())).'">'.$song->getName().
-	'</a> - '.$song->getVersions()->first()->getSampleType().' - '.$song->getVersions()->first()->getCreated()->format('Y-m-d').'<br>';
+	'</a> - '.$song->getSampleType().' - '.$song->getVersions()->first()->getCreated()->format('Y-m-d').'<br>';
 }
 echo '<hr>';
 echo '<h3>Projects in progress</h3>';

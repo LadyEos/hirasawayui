@@ -9,12 +9,16 @@ $form->prepare();
 //$form->setAttribute('action', 'upload');
 //$form->setAttribute('method', 'post');
 
+ echo 'Last version number used: '.$this->song->getVersions()->first()->getVersion();
  echo $this->form()->openTag($form);
  ?>
 
  <?php foreach ($form as $element) : ?>
 
      <div style="width: 330px;" class="form-group <?php if ($this->formElementErrors($element)) echo "has-error" ?>">
+         
+         
+         
          <?php
         
              
@@ -52,3 +56,10 @@ $form->prepare();
  <?php
 endforeach;
 echo $this->form()->closeTag() ?>
+
+<?php 
+if($this->tempFile != null)
+    var_dump($this->tempFile);
+if($this->errors!= null)
+    var_dump($this->errors);
+?>

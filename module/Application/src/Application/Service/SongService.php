@@ -9,7 +9,7 @@ use Application\Entity\Genres;
 
 class SongService implements ServiceLocatorAwareInterface{
     
-    protected $songCategoriesService;
+    protected $song;
     protected $em;
     /**
      * Set the service locator.
@@ -33,7 +33,7 @@ class SongService implements ServiceLocatorAwareInterface{
     	return $this->serviceLocator;
     }
     
-    public function findSong($id){
+    public function find($id){
     	$objectManager = $this->getServiceLocator()->get('Application\Service\DoctrineOMService');
     	
     	$song = $objectManager->find('Application\Entity\Songs', $id);
@@ -42,22 +42,49 @@ class SongService implements ServiceLocatorAwareInterface{
     	return $song;
     }
     
-    public function saveSong($data,$user,$sample=null,$file=null,$url=null){
+    public function create($data,$user,$sample=false){
         
         $objectManager = $this->getServiceLocator()->get('Application\Service\DoctrineOMService');
         $song = new Songs();
-        $version = new SongsVersionHistory();
+        //$version = new SongsVersionHistory();
         
         $song->populate($data);
+        $song->setActive(1);
         
         if($sample != null){
         	$song->setCompleted(1);
-        	$song->setSample(1);
-        	$category = $this->getSongCategoriesService()->findCategoryByName('sample');
-        	$song->setCategories($category);
+        	
+        	//$category = $this->getSongCategoriesService()->findCategoryByName('sample');
+        	//$song->setCategories($category);
         
         }else{
         	$song->setSample(0);
+        	if($data['completed']==1)
+        	    $song->setCompleted(1);
+        		//$category = $this->getSongCategoriesService()->findCategoryByName('complete');
+        	//else
+        		//$category = $this->getSongCategoriesService()->findCategoryByName('progress');
+        
+        	//$song->setCategories($category);
+
+        }
+
+        $genre = $objectManager->find('Application\Entity\Genres', $data['genre']);
+        $song->setGenre($genre);
+        
+        $objectManager->persist($song);
+        
+        $user->addSongs($song);
+        
+        $objectManager->flush();
+        return $song;
+    }
+    
+    public function editSong($id,$data,$sample=null){
+        $objectManager = $this->getServiceLocator()->get('Application\Service\DoctrineOMService');
+        $song->populate($data);
+        
+        if($sample == null){
         	if($data['completed']==1)
         		$category = $this->getSongCategoriesService()->findCategoryByName('complete');
         	else
@@ -66,29 +93,12 @@ class SongService implements ServiceLocatorAwareInterface{
         	$song->setCategories($category);
         }
         
-        
         $genre = $objectManager->find('Application\Entity\Genres', $data['genre']);
         $song->setGenres($genre);
-        
-        $objectManager->persist($song);
-        
         $version->populate($data);
-        $version->setSongs($song);
-        $version->setUsers($user);
-        
-        
-        if($sample != null)
-        	$version->setSampletype($data['type']);
-        
-        if($file != null && $url != null)
-            $version->setUrl($url . $file['file']['name']);
-        
-        
-        $objectManager->persist($version);
-        
-        $user->addSongs($song);
-        
         $objectManager->flush();
+        
+        return $song;
     }
     
     private function getSongCategoriesService()
@@ -106,6 +116,18 @@ class SongService implements ServiceLocatorAwareInterface{
     		$this->em = $this->getServiceLocator()->get('Doctrine\ORM\EntityManager');
     	}
     	return $this->em;
+    }
+    
+    public function setSong($song){
+    	$this->song = $song;
+    }
+    
+    public function getSong(){
+        return $this->song;	
+    }
+    
+    public function countVersions(){
+    	return $this->song->getVersions()->count();
     }
     
 }

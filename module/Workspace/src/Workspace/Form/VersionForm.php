@@ -8,10 +8,10 @@ use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use Doctrine\ORM\EntityManager; // \ObjectManager;
 use DoctrineModule\Stdlib\Hydrator\DoctrineObject as DoctrineHydrator;
 
-class UploadForm extends Form // implements ObjectManagerAwareInterface
+class VersionForm extends Form // implements ObjectManagerAwareInterface
 {
 
-    public function __construct($name = null, $sm, $sample)
+    public function __construct($name = null, $sm, $lyrics = false,$audio = false)
     {
         // we want to ignore the name passed
         // $this->setObjectManager($objectManager);
@@ -30,11 +30,25 @@ class UploadForm extends Form // implements ObjectManagerAwareInterface
             )
         ));
         
-        $file = new Element\File('file');
-        $file->setLabel('File Input')->setAttributes(array(
-            'id' => 'file'
-        ));
-        $this->add($file);
+        if($audio){
+            $file = new Element\File('file');
+            $file->setLabel('File Input')->setAttributes(array(
+                'id' => 'file'
+            ));
+            $this->add($file);
+        }
+        
+        if($lyrics){
+            $this->add(array(
+            		'name' => 'lyrics', // 'usr_name',
+            		'attributes' => array(
+            				'type' => 'textarea'
+            		),
+            		'options' => array(
+            				'label' => 'Lyrics'
+            		)
+            ));
+        }
         
         $this->add(array(
             'name' => 'comments', // 'usr_name',
@@ -45,19 +59,6 @@ class UploadForm extends Form // implements ObjectManagerAwareInterface
                 'label' => 'Version Comments'
             )
         ));
-        
-        /* if (! $sample) {
-            $radio = new Element\Radio('lyrics');
-            $radio->setLabel('Add lyrics?');
-            $radio->setValueOptions(array(
-                '0' => 'don\'t add any lyrics',
-                '1' => 'add to this version',
-                '2' => 'add in another version'
-            ));
-            $radio->setValue('0');
-            
-            $this->add($radio);
-        } */
         
         $this->add(array(
             'name' => 'submit',
