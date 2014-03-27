@@ -1,0 +1,25 @@
+<?php
+$title = 'Store';
+$this->headTitle($title);
+?>
+<h1><?php echo $this->escapeHtml($title); ?></h1>
+<div>
+<p>Total Items: <?php echo $this->total_items;?></p>
+
+<p>Total Sum: $<?php echo $this->total_sum?></p>
+<p>
+    <?php if(sizeof($this->cart) > 0):?>
+        <ul>
+        <?php foreach ($this->cart as $item_key =>$item_value ){?>
+            <li><?php echo $item_value->getProduct()?> <a href="<?php echo $this->url('store',
+                     array('action' => 'remove','token'=>$item_key));?>">Remove</a></li>
+        <?php }?>
+        </ul>
+    <?php else:?>
+    There are no items to download
+    <?php endif;?>
+</p>
+<?php //var_dump($this->cart)?>
+
+
+</div>

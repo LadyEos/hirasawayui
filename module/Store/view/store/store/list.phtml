@@ -1,0 +1,32 @@
+<?php
+$title = 'Store';
+$this->headTitle($title);
+?>
+<h1><?php echo $this->escapeHtml($title); ?></h1>
+<div>
+<table class="table">
+     <tr>
+         <th>Name</th>
+         <th>Description</th>
+         <th>&nbsp;</th>
+     </tr>
+     <?php foreach ($this->paginator as $song) : // <-- change here! ?>
+         <tr>
+             <td><?php echo $this->escapeHtml($song->getName());?></td>
+             <td><?php echo $this->escapeHtml($song->getDescription());?></td>
+             <td>
+                 <a href="<?php echo $this->url('store',
+                     array('action' => 'buy', 'id' => $song->getId()));?>">Add To Download List</a>
+                 <a href="<?php echo $this->url('song',
+                     array('action' => 'view', 'id' => $song->getId()));?>">View</a>
+             </td>
+         </tr>
+     <?php endforeach; ?>
+ </table>
+    <?php ///* 
+echo $this->paginationControl(
+    $this->paginator, 'Sliding', 'pagination/sliding', array('route'=>'store','action'=>'list')
+);
+      //*/
+?>
+</div>
