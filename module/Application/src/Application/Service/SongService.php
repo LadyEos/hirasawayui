@@ -3,14 +3,22 @@ namespace Application\Service;
 
 use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
+use Zend\Config;
 use Application\Entity\Songs;
 use Application\Entity\SongsVersionHistory;
 use Application\Entity\Genres;
+
 
 class SongService implements ServiceLocatorAwareInterface{
     
     protected $song;
     protected $em;
+    protected $entity = 'Application\Entity\Songs';
+    protected $entityGenres = 'Application\Entity\Genres';
+    protected $oMService;
+    protected $actionService;
+    protected $priceService;
+    
     /**
      * Set the service locator.
      *
@@ -34,42 +42,45 @@ class SongService implements ServiceLocatorAwareInterface{
     }
     
     public function find($id){
-    	$objectManager = $this->getServiceLocator()->get('Application\Service\DoctrineOMService');
+    	$objectManager = $this->getOMService();
     	
-    	$song = $objectManager->find('Application\Entity\Songs', $id);
+    	$song = $objectManager->find($this->entity, $id);
     	
     	
     	return $song;
     }
     
+    public function findAll(){
+    	$objectManager = $this->getOMService()->getEntityManager();
+    	//$this->getEntityManager()->getRepository('Album\Entity\Album')->findAll(
+    	return $objectManager->getRepository($this->entity)->findAll();
+    }
+    
+    public function findBy($array){
+        $objectManager = $this->getEntityManager();
+        return $objectManager->getRepository($this->entity)->findBy($array);
+    }
+    
     public function create($data,$user,$sample=false){
-        
-        $objectManager = $this->getServiceLocator()->get('Application\Service\DoctrineOMService');
+        $boolAction = false;
+        $objectManager = $this->getOMService();
         $song = new Songs();
-        //$version = new SongsVersionHistory();
         
         $song->populate($data);
         $song->setActive(1);
         
         if($sample != null){
         	$song->setCompleted(1);
-        	
-        	//$category = $this->getSongCategoriesService()->findCategoryByName('sample');
-        	//$song->setCategories($category);
         
         }else{
         	$song->setSample(0);
-        	if($data['completed']==1)
+        	if($data['completed']==1){
         	    $song->setCompleted(1);
-        		//$category = $this->getSongCategoriesService()->findCategoryByName('complete');
-        	//else
-        		//$category = $this->getSongCategoriesService()->findCategoryByName('progress');
-        
-        	//$song->setCategories($category);
-
+        	    $boolAction = true;
+        	}
         }
 
-        $genre = $objectManager->find('Application\Entity\Genres', $data['genre']);
+        $genre = $objectManager->find($this->entityGenres, $data['genre']);
         $song->setGenre($genre);
         
         $objectManager->persist($song);
@@ -77,28 +88,71 @@ class SongService implements ServiceLocatorAwareInterface{
         $user->addSongs($song);
         
         $objectManager->flush();
+        
+        $this->getActionService()->create($song->getId(), 'created project', $user);
+        
+        $config = $this->getServiceLocator()->get('config');
+        $amount =  $config['MusicLackey']['songPrice'];
+
+        $this->getPriceService()->create($amount,$song);
+        
+        if($boolAction){
+            $this->getActionService()->create($song->getId(), 'complete project', $user);
+        }
+        
         return $song;
     }
     
-    public function editSong($id,$data,$sample=null){
-        $objectManager = $this->getServiceLocator()->get('Application\Service\DoctrineOMService');
-        $song->populate($data);
+    public function edit($data,$song){
+        $objectManager = $this->getOMService();
+        //$this->song->populate($data);
         
-        if($sample == null){
+        /*if($sample == null || $sample == 0){
         	if($data['completed']==1)
         		$category = $this->getSongCategoriesService()->findCategoryByName('complete');
         	else
         		$category = $this->getSongCategoriesService()->findCategoryByName('progress');
         
         	$song->setCategories($category);
-        }
+        }*/
         
-        $genre = $objectManager->find('Application\Entity\Genres', $data['genre']);
-        $song->setGenres($genre);
-        $version->populate($data);
+        $genre = $objectManager->find($this->entityGenres, $data['genre']);
+        $song->setGenre($genre);
+        
         $objectManager->flush();
         
-        return $song;
+        if($data['completed']==1){
+        	foreach ($song->getUsers() as $user)
+                $this->getActionService()->create($song->getId(), 'complete project', $user);
+        }
+        
+        return $this->song;
+    }
+    
+    public function delete($song){
+        $objectManager = $this->getOMService();
+        $song->setActive(0);
+        $objectManager->flush();
+    }
+    
+    public function setComplete($song){
+        $objectManager = $this->getOMService();
+        $song->setCompleted(1);
+        $objectManager->flush();
+        foreach ($song->getUsers() as $user)
+        	$this->getActionService()->create($song->getId(), 'complete project', $user);
+    }
+    
+    public function setSong($song){
+    	$this->song = $song;
+    }
+    
+    public function getSong(){
+    	return $this->song;
+    }
+    
+    public function countVersions(){
+    	return $this->song->getVersions()->count();
     }
     
     private function getSongCategoriesService()
@@ -118,16 +172,30 @@ class SongService implements ServiceLocatorAwareInterface{
     	return $this->em;
     }
     
-    public function setSong($song){
-    	$this->song = $song;
+    private function getOMService()
+    {
+    	if (! $this->oMService) {
+    		$this->oMService = $this->getServiceLocator()->get('Application\Service\DoctrineOMService');
+    	}
+    
+    	return $this->oMService;
     }
     
-    public function getSong(){
-        return $this->song;	
+    private function getActionService()
+    {
+    	if (! $this->actionService) {
+    		$this->actionService = $this->getServiceLocator()->get('Application\Service\ActionService');
+    	}
+    
+    	return $this->actionService;
     }
     
-    public function countVersions(){
-    	return $this->song->getVersions()->count();
-    }
+    private function getPriceService()
+    {
+    	if (! $this->priceService) {
+    		$this->priceService = $this->getServiceLocator()->get('Application\Service\PriceService');
+    	}
     
+    	return $this->priceService;
+    }
 }

@@ -1,0 +1,44 @@
+<div class="jumbotron">
+    <h1><?php echo sprintf('Welcome to MusicLackey', '<span class="zf-green">', '</span>') ?></h1>
+    <p><?php echo sprintf($this->translate('A place where you can meet other musicians to create new music')) ?></p>
+    <p><a class="btn btn-success btn-lg" href="<?php echo $this->url('zfcuser/register')?>"><?php echo $this->translate('Register') ?> &raquo;</a></p>
+</div>
+
+<div class="row">
+
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><?php echo $this->translate('Create Music') ?></h3>
+            </div>
+            <div class="panel-body">
+                <p><?php echo sprintf($this->translate('If you compose music, make lyrics or anything else')) ?></p>
+                <p><a class="btn btn-success pull-right" href="<?php echo $this->url('zfcuser/register')?>"><?php echo $this->translate('Register') ?> &raquo;</a></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><?php echo $this->translate('Meet People') ?></h3>
+            </div>
+            <div class="panel-body">
+                <p><?php echo sprintf($this->translate('We put you in contact with people missing you talent!')) ?></p>
+                <p><a class="btn btn-success pull-right" href="<?php echo $this->url('zfcuser/register')?>"><?php echo $this->translate('Register') ?> &raquo;</a></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><?php echo $this->translate('Sell your creation') ?></h3>
+            </div>
+            <div class="panel-body">
+                <p><?php echo sprintf($this->translate('Once you and you peers have composed a song. Sell it here!')) ?></p>
+                <p><a class="btn btn-success pull-right" href="<?php echo $this->url('zfcuser/register')?>"><?php echo $this->translate('Register') ?> &raquo;</a></p>
+            </div>
+        </div>
+    </div>
+</div>

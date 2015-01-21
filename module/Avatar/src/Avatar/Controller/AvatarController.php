@@ -43,35 +43,66 @@ class AvatarController extends AbstractActionController
         
         $profile = $user->getUserProfile();
         $this->getProfileService()->setProfile($profile);
-        
-        //$this->_view = new ViewModel();
+
         $form = new UploadForm('upload-form');
 
-        $upload = new \Zend\File\Transfer\Transfer();
-        $upload->setDestination('./public'.$url);
-        $upload->addFilter('File\Rename',array(
-        	'target' => './public'.$url.'avatar.png',
-            'randomize' => true,
-            'use_upload_extension' => true
-        ));
-        
         if ($this->getRequest()->isPost()) {
             // Postback
+            $form->setInputFilter(new UploadFilter($this->getServiceLocator()));
             $data = array_merge_recursive(
-                $this->getRequest()->getPost()->toArray(), 
-                $this->getRequest()->getFiles()->toArray());
-            
+                $this->getRequest()->getPost()->toArray(),
+            	$this->getRequest()->getFiles()->toArray());
             $form->setData($data);
+            
             if ($form->isValid()) {
+                $data = $form->getData();
+                
+                //$upload = new \Zend\File\Transfer\Transfer();
+                //$upload->setDestination('./public'.$url);
+                
+                //$file = $upload->getFileInfo();
+                $extension = pathinfo($data['file']['name'], PATHINFO_EXTENSION);
+                	
+                //$uniqueId = uniqid();
+                $string = './public'.$url.'/';
+                $filter = new \Zend\Filter\File\Rename(array(
+                		'target' => $string.'avatar.'.$extension,
+                		'randomize' => true,
+                		'overwrite' => false
+                ));
+                
+                //$upload->addFilter($filter);
+                /*$upload->addFilter('File\Rename',array(
+                        'target' => 'avatar.'.$extension,
+                		'randomize' => true,
+                		'overwrite' => false
+                ));*/
+                
+                //$filters = $upload->getFilters();
+                //$filter = $upload->getFilter('Zend\Filter\File\Rename');
+                
+                //echo '<br><br><br><br><br>';
+                $upload = $filter->filter($data['file']);
+                //var_dump($upload);
+                //var_dump($data);
+                //$file = $upload->getFileInfo();
+                
+                //var_dump($filter->getFile());
+                
+                //var_dump($filter);
+                //var_dump($upload->getFileName());
 
-                if ($upload->receive()) {
-                    $file = $upload->getFileInfo();
-                    $this->getProfileService()->setProfilePicture($url.$file['file']['name']);
+                if ($upload['error'] == 0) {
+                    $lenght = strlen($string);
+                    $name = substr($upload['tmp_name'], $lenght-1);
+                    
+                    $this->getProfileService()->setProfilePicture($url.$name);
                 } else {
-                    $errors = $uploadedFile->getErrors();
+                    $errors = $upload['error'];
                 }
                 
-                return $this->redirect()->toRoute('zfcuser/home');
+                
+                //return $this->redirect()->toRoute('zfcuser/home');
             }
         }
         

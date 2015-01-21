@@ -1,0 +1,19 @@
+
+<?php
+$title = 'Donwload';
+$this->headTitle($title);
+?>
+<h1><?php echo $this->escapeHtml($title); ?></h1>
+
+<?php foreach ($this->downloads as $download){
+	//var_dump($download);
+    
+    
+	if($download->getSong() != null){
+        echo '<a href="'.$this->url('download',array('action'=>'file','key'=>$download->getKey()))
+	       .'">'.$download->getSong()->getName().'</a><br>';
+	}else{
+		echo '<a href="'.$this->url('download',array('action'=>'file','key'=>$download->getKey()))
+            .'">'.$download->getAlbum()->getName().'</a><br>';
+	}
+}?>

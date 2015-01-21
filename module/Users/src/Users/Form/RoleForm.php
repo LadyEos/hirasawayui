@@ -14,7 +14,7 @@ class RoleForm extends Form //implements ObjectManagerAwareInterface
        
         $this->add(array(
             'type' => 'Select',
-            'name' => 'profile_types',
+            'name' => 'roles',
             'options' => array(
                 'label' => 'Role',
                 'empty_option' => 'Choose a role',

@@ -11,25 +11,45 @@ class PrivateMessages {
 	protected $id;
 
 	/**
-     * @ORM\ManyToOne(targetEntity="Users", inversedBy="senders")
+     * @ORM\ManyToOne(targetEntity="Users", inversedBy="sentMessages")
      * @ORM\JoinColumn(name="sender_id", referencedColumnName="id")
      **/
 	protected $sender;
 	
-	/**
+	/*
      * @ORM\ManyToOne(targetEntity="Users", inversedBy="recipients")
      * @ORM\JoinColumn(name="recipient_id", referencedColumnName="id")
      **/
+	
+	/**
+	 * @ORM\ManyToMany(targetEntity="Users", inversedBy="recipients")
+	 * @ORM\JoinTable(name="Recipients",
+	 *      joinColumns={@ORM\JoinColumn(name="message_id", referencedColumnName="id")},
+	 *      inverseJoinColumns={@ORM\JoinColumn(name="recipient_id", referencedColumnName="id")}
+	 *      )
+	 **/
 	protected $recipient;
 	
 	/** @ORM\Column(type="datetime") */
 	protected $sent;
 	
-	/** @ORM\Column(type="string", length=300)*/
+	/** @ORM\Column(type="boolean") */
+	protected $opened;
+	
+	/** @ORM\Column(type="boolean") */
+	protected $deleted;
+	
+	/** @ORM\Column(type="string", length=500)*/
 	protected $message;
+	
+	/** @ORM\Column(type="string", length=100)*/
+	protected $subject;
 
 	public function __construct(){
 		$this->sent = new \DateTime();
+		$this->opened = false;
+		$this->deleted = false;
+		$this->recipient = new \Doctrine\Common\Collections\ArrayCollection();
 	}
 
 	// getters/setters
@@ -51,11 +71,19 @@ class PrivateMessages {
 	}
 	
 	public function setRecipient($recipient){
-		$this->recipient = $recipientt;
+		$this->recipient = $recipient;
 	}
 	
 	public function getSent(){
 		return $this->sent;
+	}
+	
+	public function getOpened(){
+		return $this->opened;
+	}
+	
+	public function setOpened($opened){
+		$this->opened = $opened;
 	}
 
 	public function getMessage(){
@@ -64,5 +92,43 @@ class PrivateMessages {
 
 	public function setMessage($message){
 		$this->message = $message;
+	}
+	
+	public function getSubject(){
+		return $this->subject;
+	}
+	
+	public function setSubject($subject){
+		$this->subject = $subject;
+	}
+	
+	public function getDeleted(){
+		return $this->deleted;
+	}
+	
+	public function setDeleted($deleted){
+		$this->deleted = $deleted;
+	}
+	
+	
+	public function hasRecipient (Users $user) {
+		$users = array();
+		foreach ($this->getRecipient() as $arrMember) {
+			$users[] = $arrMember->getId();
+		}
+		if (in_array($user->getId(), $users))
+			return true;
+		else
+		    return false;
+	}
+	
+	public function removeRecipient (Users $user) {
+		$this->recipient->removeElement($user);
+		$user->unsetRecipient($this);
+	}
+	
+	public function addRecipient (Users $user) {
+		$user->setRecipient($this);
+		$this->recipient[] = $user;
 	}
 }

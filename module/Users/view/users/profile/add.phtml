@@ -12,7 +12,7 @@ echo $this->inlineScript()->prependFile($this->basePath('js/profile.js'));
 $form->prepare();
 //$form->setAttribute('action', $this->url('zfcuser', array('action' => 'addprofile')));
 //$form->setAttribute('action', 'add');
-//$form->setAttribute('method', 'post');
+$form->setAttribute('method', 'post');
 
  echo $this->form()->openTag($form);
  
@@ -26,7 +26,7 @@ $form->prepare();
              if ('submit' != $element->getAttribute('type')) { ?>
                  <label class="control-label"><?php echo $element->getLabel() ?></label>
                  <?php
-                 $element->setAttribute('class', 'form-control')
+                 $element//->setAttribute('class', 'form-control')
                          ->setAttribute('placeholder', $element->getLabel());
              } else {
                  $element->setAttribute('class', 'btn btn-success');

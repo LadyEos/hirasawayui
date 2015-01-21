@@ -13,6 +13,9 @@ class SongsVersionHistory {
 	/** @ORM\Column(type="string", length=300, nullable=TRUE) */
 	protected $url;
 	
+	///** @ORM\Column(type="string", length=300, nullable=TRUE) */
+	//protected $urlOgg;
+	
 	/** @ORM\Column(type="string", length=2000,nullable=TRUE) */
 	protected $lyrics;
 
@@ -24,6 +27,12 @@ class SongsVersionHistory {
 	
 	/** @ORM\Column(type="string", length=300, nullable=TRUE) */
 	protected $comments;
+	
+	/** @ORM\Column(type="smallint", nullable=TRUE) */
+	protected $bitrate;
+	
+	/** @ORM\Column(type="string", nullable=TRUE) */
+	protected $length;
 	
 	/**
 	 * @ORM\ManyToOne(targetEntity="Songs", inversedBy="versions", cascade={"persist", "remove"})
@@ -53,6 +62,22 @@ class SongsVersionHistory {
 	
 	public function setUrl($url){
 		$this->url = $url;
+	}
+	
+	public function getBitrate(){
+		return $this->bitrate;
+	}
+	
+	public function setBitrate($bitrate){
+		$this->bitrate = $bitrate;
+	}
+	
+	public function getLength(){
+		return $this->length;
+	}
+	
+	public function setLength($length){
+		$this->length = $length;
 	}
 	
 	public function getLyrics(){
@@ -122,6 +147,9 @@ class SongsVersionHistory {
 	    
 	    if(array_key_exists('url', $data))
 		  $this->url = $data['url'];
+	    
+	    //if(array_key_exists('urlogg', $data))
+	    //	$this->urlOgg = $data['urlogg'];
 	    
 	    if(array_key_exists('lyrics', $data))
 		  $this->lyrics = $data['lyrics'];

@@ -1,0 +1,26 @@
+<?php
+$title = 'Get Paid Center';
+$this->headTitle($title);
+$logUserId = $this->zfcUserIdentity()->getId();
+//echo $logUserId;
+//var_dump($logUser);
+?>
+
+
+<div class="page-header">
+    <h1><?php echo $this->translate($title); ?></h1>
+</div>
+<div class="container">
+<div class="row">
+<div id="fields" class="col-md-5">
+<?php echo $this->flashMessenger()->render();?>
+How do yo wanna get paid? 
+<?php if($this->user->getBank() == null):?>
+<a href="<?php echo $this->url('payment',array('action'=>'add'))?>">Add a Payment option</a>
+<?php else:?>
+<a href="<?php echo $this->url('payment',array('action'=>'edit'))?>">Edit Payment options</a>
+<?php endif;?>
+</div>
+</div>
+</div>
+

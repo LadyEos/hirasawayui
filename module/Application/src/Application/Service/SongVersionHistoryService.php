@@ -14,6 +14,7 @@ class SongVersionHistoryService implements ServiceLocatorAwareInterface{
     protected $entity = 'Application\Entity\SongsVersionHistory';
     protected $songService;
     protected $userService;
+    protected $oMService;
     /**
      * Set the service locator.
      *
@@ -37,7 +38,7 @@ class SongVersionHistoryService implements ServiceLocatorAwareInterface{
     }
     
     public function find($id){
-    	$objectManager = $this->getServiceLocator()->get('Application\Service\DoctrineOMService');
+    	$objectManager = $this->getOMService();
     	
     	$songVersionHistory = $objectManager->find($this->entity, $id);
     	
@@ -45,9 +46,9 @@ class SongVersionHistoryService implements ServiceLocatorAwareInterface{
     	return $songVersionHistory;
     }
     
-    public function create($data,$userId,$songId,$file=null,$url=null){
+    public function create($data,$userId,$songId,$file=null,$url=null,$bitrate = null,$length =null){
         
-        $objectManager = $this->getServiceLocator()->get('Application\Service\DoctrineOMService');
+        $objectManager = $this->getOMService();
         $version = new SongsVersionHistory();
         $song = $this->getSongService()->find($songId);
         $old = null;
@@ -59,11 +60,15 @@ class SongVersionHistoryService implements ServiceLocatorAwareInterface{
         
         $version->populate($data);
         
-        if($file != null && $url != null)
-        	$version->setUrl($url . $file['file']['name']);
-        else{
+        if($file != null && $url != null){
+        	$version->setUrl($url . $file);
+        	$version->setBitrate($bitrate);
+        	$version->setLength($length);
+        }else{
             if($old != null && $old->getUrl() != null && $old->getUrl() != '')
                 $version->setUrl($old->getUrl());
+                $version->setBitrate($old->getBitrate());
+                $version->setLength($old->getLength());
         }
         
         if(!isset($data['lyrics']) || ($data['lyrics'] == null || $data['lyrics'] == '')){
@@ -82,7 +87,7 @@ class SongVersionHistoryService implements ServiceLocatorAwareInterface{
     }
     
     public function editSong($id,$data,$sample=null){
-        $objectManager = $this->getServiceLocator()->get('Application\Service\DoctrineOMService');
+        $objectManager = $this->getOMService();
         
         
         $version->populate($data);
@@ -113,6 +118,15 @@ class SongVersionHistoryService implements ServiceLocatorAwareInterface{
     	}
     
     	return $this->userService;
+    }
+    
+    private function getOMService()
+    {
+    	if (! $this->oMService) {
+    		$this->oMService = $this->getServiceLocator()->get('Application\Service\DoctrineOMService');
+    	}
+    
+    	return $this->oMService;
     }
     
 }

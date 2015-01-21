@@ -71,17 +71,30 @@ class UserProfiles
      * @ORM\Column(type="string", length=128, nullable=TRUE)
      */
     protected $displayname;
-    
+
     /**
      * @ORM\Column(type="string", length=1, nullable=TRUE)
      */
     protected $gender;
-    
-    
+
     /**
      * @ORM\Column(type="string", length=128, nullable=TRUE)
      */
     protected $gravatar_email;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="Genres",inversedBy="userprofiles")
+     * @ORM\JoinTable(name="UserGenres",
+     * joinColumns={@ORM\JoinColumn(name="user_profile_id", referencedColumnName="id")},
+     * inverseJoinColumns={@ORM\JoinColumn(name="genre_id", referencedColumnName="id")}
+     * )
+     */
+    protected $genres;
+
+    public function __construct()
+    {
+        $this->genres = new \Doctrine\Common\Collections\ArrayCollection();
+    }
     
     // getters/setters
     public function getId()
@@ -178,35 +191,45 @@ class UserProfiles
     {
         $this->user = $user;
     }
-    
+
     public function getGender()
     {
-    	return $this->gender;
+        return $this->gender;
     }
-    
+
     public function setGender($gender)
     {
-    	$this->gender = $gender;
+        $this->gender = $gender;
     }
-    
+
     public function getGravatarEmail()
     {
-    	return $this->gravatar_email;
+        return $this->gravatar_email;
     }
-    
+
     public function setGravatarEmail($gravatarEmail)
     {
-    	$this->gravatar_email = $gravatarEmail;
+        $this->gravatar_email = $gravatarEmail;
     }
-    
+
     public function getCountry()
     {
-    	return $this->country;
+        return $this->country;
     }
-    
+
     public function setCountry($country)
     {
-    	$this->country = $country;
+        $this->country = $country;
+    }
+
+    public function getGenres()
+    {
+        return $this->genres;
+    }
+
+    public function setGenres($genre)
+    {
+        $this->genres = $genre;
     }
 
     /**
@@ -241,36 +264,25 @@ class UserProfiles
             $this->webpage = $data['webpage'];
         
         if (array_key_exists('displayname', $data))
-        	$this->displayname = $data['displayname'];
+            $this->displayname = $data['displayname'];
         
         if (array_key_exists('gender', $data))
-        	$this->gender = $data['gender'];
+            $this->gender = $data['gender'];
         
         if (array_key_exists('gravatar_email', $data))
-        	$this->gravatar_email = $data['gravatar_email'];
-        
-        //if (array_key_exists('country', $data))
-        	//$this->countries = $data['country'];
+            $this->gravatar_email = $data['gravatar_email'];
+            
+            // if (array_key_exists('country', $data))
+            // $this->countries = $data['country'];
         
         return $data;
     }
 
     public function getArrayCopy()
     {
-        /*return array(
-            'id' => $this->id,
-            'first_name' => $this->first_name,
-            'last_name' => $this->last_name,
-            'birthdate' => $this->birthdate,
-            'biography' => $this->biography,
-            'profile_picture_url' => $this->profile_picture_url,
-            'facebook_link' => $this->facebook_link,
-            'twitter_link' => $this->twitter_link,
-            'webpage' => $this->webpage,
-            'countries' => $this->countries,
-            'displayname' => $this->displayname
-        // 'user'=>$this->user
-                );*/
+        /*
+         * return array( 'id' => $this->id, 'first_name' => $this->first_name, 'last_name' => $this->last_name, 'birthdate' => $this->birthdate, 'biography' => $this->biography, 'profile_picture_url' => $this->profile_picture_url, 'facebook_link' => $this->facebook_link, 'twitter_link' => $this->twitter_link, 'webpage' => $this->webpage, 'countries' => $this->countries, 'displayname' => $this->displayname // 'user'=>$this->user );
+         */
         $data = get_object_vars($this);
         return $data;
     }
@@ -283,5 +295,45 @@ class UserProfiles
     public function setDisplayname($displayName)
     {
         $this->displayname = $displayName;
+    }
+    
+    /* Collection Songs */
+    public function hasGenres(Genres $genre)
+    {
+        $genres = array();
+        foreach ($this->getGenres() as $arrMember) {
+            $genres[] = $arrMember->getName();
+        }
+        if (in_array($genre->getName(), $genres)) // check if the supplied language is to be removed or not
+            return true;
+        else
+            return false;
+    }
+
+    public function removeGenre(Genres $genre)
+    {
+        $this->genres->removeElement($genre);
+        $genre->unsetUserProfile($this);
+    }
+
+    public function addGenre(Genres $genre)
+    {
+        $genre->setUserProfile($this);
+        $this->genres[] = $genre;
+    }
+
+    public function removeGenres($genres)
+    {
+        foreach ($genres as $genre) {
+            $this->removeGenre($genre);
+        }
+    }
+
+    public function addGenres($genres)
+    {
+        foreach ($genres as $genre) {
+            if (! $this->hasGenres($genre))
+                $this->addGenre($genre);
+        }
     }
 }

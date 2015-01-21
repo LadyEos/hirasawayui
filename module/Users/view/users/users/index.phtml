@@ -13,7 +13,9 @@ $user = $this->zfcUserIdentity()->getId();
 <div style="float:left; padding-right:16px;">
 <?php 
 if(isset($this->dataGravatar['useGravatar']))
-    echo '<img src="'.$this->dataGravatar['imgURL'].'" height="100px" width="100px"></img>';
+
+    echo '<a href="'.$this->url('avatar',array('action'=>'upload')).'"><img src="'
+		.$this->dataGravatar['imgURL'].'" height="100px" width="100px"></img></a>';
 else
     echo $this->gravatar($this->zfcUserIdentity()->getEmail()) ?>
 
@@ -30,7 +32,8 @@ else
     <a href="<?php //echo $this->url('zfcuser/edit');?>">Edit Profile</a><br>-->
     <a href="<?php echo $this->url('profile',array('action'=>'add')); ?>"><?php echo $this->translate('Add Profile'); ?></a><br>
     <a href="<?php echo $this->url('profile',array('action'=>'edit'));?>">Edit Profile</a><br>
-    <a href="<?php echo $this->url('profile');?>">Public Profile</a><br>
+    <a href="<?php echo $this->url('profile',array('action'=>'index'));?>">Public Profile</a><br>
+    <a href="<?php echo $this->url('profile',array('action'=>'index'));?>">Payment Information</a><br>
     <a href="<?php echo $this->url('zfcuser/changepassword')?>"><?php echo $this->translate('Change Password'); ?></a><br>
     <a href="<?php echo $this->url('zfcuser/changeemail')?>"><?php echo $this->translate('Change Email'); ?></a>
 

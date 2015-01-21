@@ -35,21 +35,25 @@ class IndexController extends AbstractActionController
         $em = $this->getOMService()->getEntityManager();
         $tool = new \Doctrine\ORM\Tools\SchemaTool($em);
         $classes = array(
-        		$em->getClassMetadata('Application\Entity\Users'),
-        		$em->getClassMetadata('Application\Entity\Albums'),
+        	
+            $em->getClassMetadata('Application\Entity\Actions'),
+            $em->getClassMetadata('Application\Entity\Albums'),
             $em->getClassMetadata('Application\Entity\Countries'),
+            $em->getClassMetadata('Application\Entity\Downloads'),
             $em->getClassMetadata('Application\Entity\Genres'),
             $em->getClassMetadata('Application\Entity\GroupChatMessages'),
             $em->getClassMetadata('Application\Entity\GroupChats'),
             $em->getClassMetadata('Application\Entity\Likes'),
             $em->getClassMetadata('Application\Entity\Payments'),
+            $em->getClassMetadata('Application\Entity\Prices'),
             $em->getClassMetadata('Application\Entity\PrivateMessages'),
-            $em->getClassMetadata('Application\Entity\ProfileTypes'),
-            $em->getClassMetadata('Application\Entity\SoldSongs'),
+            $em->getClassMetadata('Application\Entity\Role'),
+            //$em->getClassMetadata('Application\Entity\SoldSongs'),
             $em->getClassMetadata('Application\Entity\SongCategories'),
             $em->getClassMetadata('Application\Entity\Songs'),
             $em->getClassMetadata('Application\Entity\SongsVersionHistory'),
             $em->getClassMetadata('Application\Entity\UserProfiles'),
+            $em->getClassMetadata('Application\Entity\Users')
             
         );
         //$errors = $tool->createSchema($classes);
@@ -66,6 +70,8 @@ class IndexController extends AbstractActionController
         }
         return $this->doctrineTest;
     } */
+    
+    
 
     private function getOMService()
     {

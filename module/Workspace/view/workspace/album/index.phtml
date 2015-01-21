@@ -1,0 +1,62 @@
+<?php
+$title = 'Albums';
+$this->headTitle($title);
+?>
+<h1><?php echo $this->escapeHtml($title); ?></h1>
+<div>
+
+
+</div>
+
+<div class="container">
+    <div class="row">
+        <div style="width: 330px; height: 500px;" class="col-md-5">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><?php echo $this->translate('') ?></h3>
+                </div>
+                <div class="panel-body">
+                    <a href="<?php echo $this->url('album',array('action'=>'add'))?>"><?php echo $this->translate('Create Album') ?></a><br>
+                    
+                </div>
+            </div>
+        </div>
+        <div style="width: 330px; height: 500px;" class="col-md-5">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><?php echo $this->translate('ALbums') ?></h3>
+                </div>
+                <div class="panel-body">
+                    <p>
+                        <?php echo '<h3>Completed</h3>';
+
+                        foreach($this->albums as $album){
+                            if($album->getActive()){
+                                if ($album->getCompleted() == 1) {
+                                	echo '<a href="'.$this->url('album',array('action'=>'view','id'=>$album->getId())).'">'.$album->getName().
+                                	'</a> - '.$album->getCreated()->format('Y-m-d').
+                                	' - <a href="'.$this->url('album',array('action'=>'edit','id'=>$album->getId())).'">Edit</a>'.
+                                	' - <a href="'.$this->url('album',array('action'=>'delete','id'=>$album->getId())).'">Delete</a>'.
+                                	'<br>';
+                            	}
+                            }
+                        }
+                        echo '<hr>';
+                        echo '<h3>Albums in progress</h3>';
+                        foreach($this->albums as $album){
+                            if($album->getActive()){
+                                if ($album->getCompleted() == 0) {
+                                	echo '<a href="'.$this->url('album',array('action'=>'view','id'=>$album->getId())).'">'.$album->getName().
+                                	'</a>'.' - '.$album->getCreated()->format('Y-m-d').
+                                	' - <a href="'.$this->url('album',array('action'=>'edit','id'=>$album->getId())).'">Edit</a>'.
+                                	' - <a href="'.$this->url('album',array('action'=>'delete','id'=>$album->getId())).'">Delete</a>'.'<br>';
+                            	}
+                        	}
+                        }
+                        ?>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -17,14 +17,20 @@ class Countries {
 	protected $country_name;
 	
 	/**
-	 * @ORM\OneToMany(targetEntity="UserProfiles", mappedBy="countries")
+	 * @ORM\OneToMany(targetEntity="UserProfiles", mappedBy="country")
 	 **/
 	protected $profiles;
+	
+	/**
+	 * @ORM\OneToMany(targetEntity="BankAccounts", mappedBy="country")
+	 **/
+	protected $banks;
 	
 	
 
 	public function __construct() {
 	    $this->profiles = new \ArrayCollection();
+	    $this->banks = new \ArrayCollection();
 	}
 
 	// getters/setters
@@ -55,6 +61,14 @@ class Countries {
 	
 	public function setProfiles($profiles){
 		$this->profiles = $profiles;
+	}
+	
+	public function getBanks(){
+		return $this->banks;
+	}
+	
+	public function setBanks($banks){
+		$this->banks = $banks;
 	}
 	
 }

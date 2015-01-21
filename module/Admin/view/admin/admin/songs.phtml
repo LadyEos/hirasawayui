@@ -1,0 +1,44 @@
+<?php
+$title = 'Admin - Songs';
+$this->headTitle($title);
+?>
+<br><br><br><br>
+<h1><?php echo $this->escapeHtml($title); ?></h1>
+<div>
+<table class="table">
+     <tr>
+         <th>Username</th>
+         <th>Song Name</th>
+         <th>Created</th>
+         <th>Price</th>
+         <th>&nbsp;</th>
+     </tr>
+     <?php foreach ($this->paginator as $song) : // <-- change here! ?>
+         <?php //if($song->getCompleted() == 1 && $song->getSample() == 0){?>
+         <tr>
+             <td><?php 
+                foreach ($song->getUsers() as $user){
+                	echo $this->escapeHtml($user->getUsername()).'<br>';
+                }?></td>
+             <td><?php echo $this->escapeHtml($song->getName());?></td>
+             <td><?php echo $this->escapeHtml($song->getCreated()->format('Y-m-d H:i:s'));?></td>
+             <td><?php 
+                foreach ($song->getPrice() as $price){
+                	echo '$'.$this->escapeHtml($price->getAmount()).'<br>';
+                }?></td>
+             <td>
+                 <a href="<?php echo $this->url('zfcadmin/price',
+                     array('id' => $song->getId()));?>">Add Price</a>
+                 
+             </td>
+         </tr>
+        <?php //}?>
+     <?php endforeach; ?>
+ </table>
+<?php ///* 
+echo $this->paginationControl(
+    $this->paginator, 'Sliding', 'pagination/sliding', array('route'=>'zfcadmin','action'=>'songs')
+);
+      //*/
+?>
+</div>

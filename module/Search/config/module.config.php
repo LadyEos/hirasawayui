@@ -10,14 +10,15 @@ return array(
             'search' => array(
                 'type' => 'segment',
                 'options' => array(
-                    'route' => '/search[/][:action][/:id]',
+                    'route' => '/search[/:action][/:id][/page/:page]',
                     'constraints' => array(
                         'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
                         'id' => '[0-9]+'
                     ),
                     'defaults' => array(
                         'controller' => 'Search\Controller\Search',
-                        'action' => 'index'
+                        'action' => 'index',
+                        'page' => 1
                     )
                 )
             ),

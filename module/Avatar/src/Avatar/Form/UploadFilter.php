@@ -12,15 +12,26 @@ class UploadFilter extends InputFilter
     {
         // self::__construct(); // parnt::__construct(); - trows and error
         $this->add(array(
-            'name' => 'image-file',
+            'name' => 'file',
             'required' => false,
-            'filters' => array(
+            'validators' => array(
                 array(
-                    'name' => 'Zend\Filter\File\RenameUpload',
+                    'name' => '\File\Extension',
                     'options' => array(
-                        'target' => 'data/tmpuploads/avatar.png',
-                        'randomize' => true,
-                        'use_upload_extension' => true
+                        'extension' => array(
+                            'jpg',
+                            'png',
+                            'gif'
+                        )
+                    )
+                ),
+                array(
+                    'name' => '\File\ImageSize',
+                    'options' => array(
+                        'minWidth' => 100,
+                        'minHeight' => 100,
+                        'maxWidth' => 640,
+                        'maxHeight' => 640
                     )
                 )
             )

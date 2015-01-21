@@ -1,48 +1,52 @@
 <?php
-$title = 'Users';
+$title = 'Most Popular!';
 $this->headTitle($title);
 ?>
 <h1><?php echo $this->escapeHtml($title); ?></h1>
-<p>
-	<a href="<?php echo $this->url('oldish', array('action'=>'signin'));?>">Sign In</a>
-</p>
-<p>
-	<a href="<?php echo $this->url('oldish', array('action'=>'login'));?>">Login</a>
-</p>
+<div style="height:20px"></div>
+<div class="row">
+    <div class="col-md-4" style="height: 700px">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><?php echo $this->translate('Top Downloaded') ?></h3>
+            </div>
+            <div class="panel-body">
+                <ul>
+                <?php foreach ($this->topDownloaded as $result){
+                	echo '<li><a href="'.$this->url('song',array('action'=>'view','id'=>$result[0]->getSong()->getId()))
+                	.'">'.$result[0]->getSong()->getName().'</a> - '.$result[1].'</li>';
+                }?>
+                </ul>
+            </div>
+        </div>
+    </div>
 
-<?php 
-if ($user = $this->identity()) {
-        echo 'Logged in as ' . $this->escapeHtml($user->getUsername());
-    } else {
-        echo 'Not logged in';
-    }
-?>
-<table class="table">
-	<tr>
-		<th>username</th>
-		<th>email</th>
-		<th>&nbsp;</th>
-	</tr>
- <?php foreach ($users as $user) : ?>
- <tr>
-		<td><?php echo $this->escapeHtml($user->getUsername());?></td>
-		<td><?php echo $this->escapeHtml($user->getEmail());?></td>
-		<td><a
-			href="<?php
-    
-echo $this->url('oldish', array(
-        'action' => 'edit',
-        'id' => $user->getId()
-    ));
-    ?>">Edit</a> <a
-			href="<?php
-    
-echo $this->url('oldish', array(
-        'action' => 'delete',
-        'id' => $user->getId()
-    ));
-    ?>">Delete</a>
-		</td>
-	</tr>
- <?php endforeach; ?>
- </table>
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><?php echo $this->translate('Top Liked') ?></h3>
+            </div>
+            <div class="panel-body">
+                <?php foreach ($this->topLiked as $result){
+                	echo '<li><a href="'.$this->url('song',array('action'=>'view','id'=>$result[0]->getSongs()->getId()))
+                	.'">'.$result[0]->getSongs()->getName().'</a> - '.$result[1].'</li>';
+                }?>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><?php echo $this->translate('Most popular unfinished projects!') ?></h3>
+            </div>
+            <div class="panel-body">
+                <?php foreach ($this->topUnfinished as $result){
+                	echo '<li><a href="'.$this->url('song',array('action'=>'view','id'=>$result[0]->getSongs()->getId()))
+                	.'">'.$result[0]->getSongs()->getName().'</a> - '.$result[1].'</li>';
+                }?>
+            </div>
+        </div>
+    </div>
+</div>
+

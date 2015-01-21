@@ -10,11 +10,12 @@ use Application\Entity\Countries;
 class UserService implements ServiceLocatorAwareInterface{
     
     protected $profileService;
-    protected $profileTypeService;
+    protected $roleService;
     protected $em;
     protected $user;
     protected $entity = 'Application\Entity\Users';
     protected $oMService;
+    protected $actionService;
     /**
      * Set the service locator.
      *
@@ -51,6 +52,12 @@ class UserService implements ServiceLocatorAwareInterface{
         return $objectManager->find($this->entity, $id);
     }
     
+    public function findAll(){
+    	$objectManager = $this->getOMService()->getEntityManager();
+    	//$this->getEntityManager()->getRepository('Album\Entity\Album')->findAll(
+    	return $objectManager->getRepository($this->entity)->findAll();
+    }
+    
     public function findAndSetUser($id){
     	$objectManager = $this->getOMService()->getEntityManager();
     	 
@@ -73,18 +80,36 @@ class UserService implements ServiceLocatorAwareInterface{
     }
     
     
-    public function removeProfileType($profileType){
+    public function removeRole($role){
         $objectManager = $this->getOMService()->getEntityManager();
-        if($this->user->hasProfileType($profileType)){
-        	$this->user->removeProfileType($profileType);
+        if($this->user->hasRole($role)){
+        	$this->user->removeRole($role);
         	$objectManager->flush();
         }
     }
     
-    public function addProfileType($profileType){
+    public function addRole($role){
         $objectManager = $this->getOMService()->getEntityManager();
-        $this->user->addProfileType($profileType);
+        $this->user->addRole($role);
         $objectManager->flush();
+    }
+    
+    public function getRoles($user){
+    	$roles = $user->getRoles();
+    	$deletable = array();
+    	
+    	foreach ($roles as $role){
+    		if($role->getHeight() == 9)
+    		    $deletable[] =$role;
+    	}
+    	
+    	return $deletable;
+    }
+    
+    public function followUser($followee,$followed){
+    	$objectManager = $this->getOMService()->getEntityManager();
+    	
+    	$objectManager->flush();
     }
     
     public function getSampleSongs(){
@@ -95,6 +120,21 @@ class UserService implements ServiceLocatorAwareInterface{
     	}
     	
     	return $songs;
+    }
+    
+    public function getMutuals(Users $user){
+    	$follows = $user->getFollows();
+    	$followedBy = $user->getFollowedBy();
+    	
+    	$result = array();
+    	
+    	foreach ($follows as $f){
+    		if($followedBy->contains($f)){
+    			$result[] = $f;
+    		}
+    	}
+    	
+    	return $result;
     }
     
     public function getProjects(){
@@ -117,6 +157,30 @@ class UserService implements ServiceLocatorAwareInterface{
         return $songs;
     }
     
+    public function follow($user){
+        $objectManager = $this->getOMService()->getEntityManager();
+        $this->user->follow($user);
+        $objectManager->flush();
+        
+        $this->getActionService()->create($user->getId(), 'follow', $this->user);
+        
+    }
+    
+    public function unfollow($user){
+    	$objectManager = $this->getOMService()->getEntityManager();
+    	$this->user->unfollow($user);
+    	$objectManager->flush();
+    }
+    
+    public function addAuthor($user,$song){
+        $objectManager = $this->getOMService()->getEntityManager();
+        $user->addSongs($song);
+        $objectManager->flush();
+        
+        $this->getActionService()->create($song->getId(), 'author', $user);
+    }
+    
+    
     public function getEntityManager()
     {
     	if (null === $this->em) {
@@ -134,6 +198,13 @@ class UserService implements ServiceLocatorAwareInterface{
     	return $this->oMService;
     }
     
+    private function getActionService()
+    {
+    	if (! $this->actionService) {
+    		$this->actionService = $this->getServiceLocator()->get('Application\Service\ActionService');
+    	}
     
+    	return $this->actionService;
+    }
     
 }

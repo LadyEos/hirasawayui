@@ -32,16 +32,16 @@ class WorkspaceController extends AbstractActionController
         
         $user = $this->getUserService()->findAndSetUser($this->zfcUserAuthentication()->getIdentity()->getId());
         
-        if($user->getProfile_types()->first()->getProfile_key() =='B')
+        if($user->getRoles()->first()->getRole_key() =='B')
             return $this->redirect()->toRoute('zfcuser/home');
         
         $this->_view = new ViewModel();
-        $profileTypes = $user->getProfile_types()->toArray();
+        $roles = $user->getRoles()->toArray();
         $sampleSongs =  $this->getUserService()->getSampleSongs();
         $projects= $this->getUserService()->getProjects();
         $finishedProjects= $this->getUserService()->getFinishedProjects();
          
-        $this->_view->setVariable('profileTypes', $profileTypes);
+        $this->_view->setVariable('roles', $roles);
         $this->_view->setVariable('samples',$sampleSongs);
         $this->_view->setVariable('projects', $projects);
         $this->_view->setVariable('finishedProjects', $finishedProjects);

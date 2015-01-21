@@ -1,0 +1,35 @@
+<?php
+$title = 'Feed';
+$this->headTitle($title);
+?>
+
+
+<!-- <div class="page-header"> -->
+    <h1><?php //echo $this->translate($title); ?></h1>
+<!-- </div> -->
+<div class="container">
+<div class="row">
+
+<div style="width: 530px;" class="col-md-5">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title"><?php echo $this->translate('Feed!') ?></h3>
+        </div>
+        <div class="panel-body">
+            <ul>
+            <?php 
+                if(!$this->feeds){
+                	echo "You dont follow anyone yet!";
+                }else{
+                    foreach ($this->feeds as $feed){
+                        echo '<li>'.$feed.'</li>';
+                    }
+                }
+            ?>
+            </ul>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+

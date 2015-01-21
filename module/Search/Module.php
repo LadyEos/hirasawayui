@@ -27,8 +27,10 @@ class Module
 
     public function getServiceConfig()
     {
-        return array(
-            
-        );
+    	return array(
+    			'invokables' => array(
+    					'Search\Service\SearchService' => 'Search\Service\SearchService'
+    			)
+    	);
     }
 }

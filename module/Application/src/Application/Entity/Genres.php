@@ -23,12 +23,18 @@ class Genres {
     protected $subgenre;
     
     /**
-     * @ORM\OneToMany(targetEntity="Songs", mappedBy="genres")
+     * @ORM\OneToMany(targetEntity="Songs", mappedBy="genre")
      **/
     protected $songs;
     
+    /**
+     * @ORM\ManyToMany(targetEntity="UserProfiles", mappedBy="genres")
+     */
+    protected $userprofiles;
+    
     public function __construct() {
-    	$this->songs = new ArrayCollection();
+    	$this->songs = new \Doctrine\Common\Collections\ArrayCollection();
+    	$this->userprofiles = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
 	// getters/setters
@@ -67,5 +73,14 @@ class Genres {
 	
 	public function setSongs($songs){
 		$this->songs = $songs;
+	}
+	
+	
+	public function unsetUserProfile (UserProfiles $userprofile) {
+		$this->userprofiles->removeElement($userprofile);
+	}
+	
+	public function setUserProfile (UserProfiles $userprofile) {
+		$this->userprofiles[] = $userprofile;
 	}
 }

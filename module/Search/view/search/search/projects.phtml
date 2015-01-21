@@ -1,0 +1,211 @@
+<?php
+$this->headLink()->appendStylesheet($this->basePath() . '/css/blue.monday/jplayer.blue.monday.css');
+$this->headScript()->appendFile($this->basePath($this->basePath() .'/js/jQuery.jPlayer.2.6.0/jquery.jplayer.min.js'));
+$this->headScript()->appendFile($this->basePath($this->basePath() .'/js/jQuery.jPlayer.2.6.0/add-on/jplayer.playlist.min.js'));
+$this->headScript()->appendFile($this->basePath($this->basePath() .'/js/jQuery.jPlayer.2.6.0/add-on/jquery.jplayer.inspector.js'));
+//$this->headScript()->appendFile($this->basePath('js/musicplayerplaylist.js'));
+?>
+<?php //echo $this->inlineScript()->prependFile($this->basePath('js/search.js'));?>
+
+<script>
+$(document).ready(function(){
+
+	var songs = jQuery.parseJSON('<?php echo json_encode($this->playlist) ?>');
+	var myPlaylist = new jPlayerPlaylist({
+		jPlayer: "#jquery_jplayer_1",
+		cssSelectorAncestor: "#jp_container_1"
+	}, jQuery.parseJSON('<?php echo json_encode($this->playlist) ?>'), 
+
+	{
+		playlistOptions: {
+			enableRemoveControls: true,
+			free:false
+		},
+		swfPath: "/js/jQuery.jPlayer.2.6.0/",
+		supplied: "mp3",
+		smoothPlayBar: true,
+		keyEnabled: true,
+		audioFullScreen: true,
+		oggSupport:false
+	});
+  
+	$("#jplayer_inspector_1").jPlayerInspector({jPlayer:$("#jquery_jplayer_1")});
+	
+    //$("#jquery_jplayer_1").setMedia(songs);
+	<?php if($this->playerTime != 0){?>
+	$("#jquery_jplayer_1").bind($.jPlayer.event.timeupdate, function(event) {
+		  if(event.jPlayer.status.currentTime > <?php echo $this->playerTime;?>) {
+		    $(this).jPlayer("pause");
+		    myPlaylist.next();
+		  }
+		});
+	<?php }?>
+
+	//var str = JSON.stringify(songs, undefined, 2);
+	//$("#dump").html("<span>"+str+"</span>");
+
+	var config = {
+			  '.chosen-select'           : {},
+			  '.chosen-select-deselect'  : {allow_single_deselect:true},
+			  '.chosen-select-no-single' : {disable_search_threshold:10},
+			  '.chosen-select-no-results': {no_results_text:'Oops, nothing found!'},
+			  '.chosen-select-width'     : {width:"95%"}
+			};
+			for (var selector in config) {
+			  $(selector).chosen(config[selector]);
+			}
+});
+</script>
+
+<div class="page-header">
+    <h1><?php echo $this->translate('Search'); ?></h1>
+</div>
+<div>
+    <p> <br>
+    </p>
+</div>
+<div class="row">
+    <?php $form->prepare();
+    $form->setAttribute('method', 'get');
+    echo $this->form()->openTag($form); ?>
+    <div id="fields" class="col-md-5">
+    <?php foreach ($form as $element) : ?>
+        <div style="width: 330px;" class="form-group <?php if ($this->formElementErrors($element)) echo "has-error" ?> ">
+            <?php 
+            if ('submit' != $element->getAttribute('type')) {?>
+                 
+                 <label class="control-label"><?php echo $element->getLabel() ?></label>
+                 <?php
+                 $element//->setAttribute('class', 'form-control')
+                         ->setAttribute('placeholder', $element->getLabel());
+                 
+             } else {
+                 $element->setAttribute('class', 'btn btn-success');
+             }
+             if ($element instanceof Zend\Form\Element\Captcha) {
+                 echo $this->formCaptcha($element);
+             } else {
+                 echo $this->formElement($element);
+             }
+             if ($this->formElementErrors($element)) : ?>
+                 <?php
+                 echo $this->formElementErrors()
+                     ->setMessageOpenFormat('<p class="help-block">')
+                     ->setMessageSeparatorString('</p><p class="help-block">')
+                     ->setMessageCloseString('</p>')
+                     ->render($element);
+                 ?>
+             <?php endif; ?>
+        </div>
+    <?php endforeach;?>
+    </div>
+    <?php echo $this->form()->closeTag() ?>
+</div>     
+
+
+<?php if(!empty($this->playlist)){?>
+  <div id="audioWrapper">
+
+		<div id="jp_container_1" class="jp-video jp-video-270p">
+			<div class="jp-type-playlist">
+				<div id="jquery_jplayer_1" class="jp-jplayer"></div>
+				<div class="jp-gui">
+					<div class="jp-video-play">
+						<a href="javascript:;" class="jp-video-play-icon" tabindex="1">play</a>
+					</div>
+					<div class="jp-interface">
+						<div class="jp-progress">
+							<div class="jp-seek-bar">
+								<div class="jp-play-bar"></div>
+							</div>
+						</div>
+						<div class="jp-current-time"></div>
+						<div class="jp-duration"></div>
+						<div class="jp-details">
+							<ul>
+								<li><span class="jp-title"></span></li>
+							</ul>
+						</div>
+						<div class="jp-controls-holder">
+							<ul class="jp-controls">
+								<li><a href="javascript:;" class="jp-previous" tabindex="1">previous</a></li>
+								<li><a href="javascript:;" class="jp-play" tabindex="1">play</a></li>
+								<li><a href="javascript:;" class="jp-pause" tabindex="1">pause</a></li>
+								<li><a href="javascript:;" class="jp-next" tabindex="1">next</a></li>
+								<li><a href="javascript:;" class="jp-stop" tabindex="1">stop</a></li>
+								<li><a href="javascript:;" class="jp-mute" tabindex="1" title="mute">mute</a></li>
+								<li><a href="javascript:;" class="jp-unmute" tabindex="1" title="unmute">unmute</a></li>
+								<li><a href="javascript:;" class="jp-volume-max" tabindex="1" title="max volume">max volume</a></li>
+							</ul>
+							<div class="jp-volume-bar">
+								<div class="jp-volume-bar-value"></div>
+							</div>
+							<ul class="jp-toggles">
+								<li><a href="javascript:;" class="jp-full-screen" tabindex="1" title="full screen">full screen</a></li>
+								<li><a href="javascript:;" class="jp-restore-screen" tabindex="1" title="restore screen">restore screen</a></li>
+								<li><a href="javascript:;" class="jp-shuffle" tabindex="1" title="shuffle">shuffle</a></li>
+								<li><a href="javascript:;" class="jp-shuffle-off" tabindex="1" title="shuffle off">shuffle off</a></li>
+								<li><a href="javascript:;" class="jp-repeat" tabindex="1" title="repeat">repeat</a></li>
+								<li><a href="javascript:;" class="jp-repeat-off" tabindex="1" title="repeat off">repeat off</a></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+				<div class="jp-playlist">
+					<ul>
+						<!-- The method Playlist.displayPlaylist() uses this unordered list -->
+						<li></li>
+					</ul>
+				</div>
+				<div class="jp-no-solution">
+					<span>Update Required</span>
+					To play the media you will need to either update your browser to a recent version or update your <a href="http://get.adobe.com/flashplayer/" target="_blank">Flash plugin</a>.
+				</div>
+			</div>
+		</div>
+		
+		<div id="jplayer_inspector_1"></div>
+	</div>
+<?php }?>
+
+
+<div class="row">
+<?php if(isset($this->paginator)){?>
+<table class="table">
+     <tr>
+         <th>Name</th>
+         <th>Author(s)</th>
+         <th>Created</th>
+         <th>version</th>
+         <th>genre</th>
+         <th>&nbsp;</th>
+     </tr>
+     <?php foreach ($this->paginator as $song) : // <-- change here! ?>
+         <tr>
+            <td>
+                <a href="<?php echo $this->url('song',array('action'=>'view','id'=>$song->getId()));?>">
+                    <?php echo $this->escapeHtml($song->getName());?></td>
+                </a>
+             <td>
+                <?php foreach($song->getUsers() as $user){
+                	?>
+                	<a href="<?php echo $this->url('profile',array('action'=>'index','id'=>$user->getId()));?>">
+                        <?php echo $this->escapeHtml($user->getUsername());?>
+                    </a>
+                    <br>
+                <?php }?>
+             </td>
+             <td><?php echo $this->escapeHtml($song->getVersions()->first()->getCreated()->format('Y-m-d'));?></td>
+             <td><?php echo $this->escapeHtml($song->getVersions()->first()->getVersion());?></td>
+             <td><?php echo $this->escapeHtml($song->getGenre()->getName());?></td>
+             <td>&nbsp;</td>
+         </tr>
+     <?php endforeach; ?>
+ </table>
+<?php ///* 
+echo $this->paginationControl(
+    $this->paginator, 'Sliding', 'pagination/get', array('route'=>'search','action'=>'projects','keyword'=>$this->keyword,'genre'=>$this->genre)
+);
+?>
+<?php }?>
+</div>

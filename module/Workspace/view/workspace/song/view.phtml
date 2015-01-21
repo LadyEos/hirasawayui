@@ -1,4 +1,8 @@
-<?php echo $this->inlineScript()->prependFile($this->basePath('js/musicplayer.js')); ?>
+<?php 
+$this->headLink()->appendStylesheet($this->basePath() . '/css/blue.monday/jplayer.blue.monday.css');
+$this->headScript()->appendFile($this->basePath($this->basePath() .'/js/jQuery.jPlayer.2.6.0/jquery.jplayer.min.js'));
+$this->headScript()->appendFile($this->basePath($this->basePath() .'/js/jQuery.jPlayer.2.6.0/add-on/jquery.jplayer.inspector.js'));
+$this->headScript()->appendFile($this->basePath('js/musicplayer.js')); ?>
 <?php
 
 if(isset($this->version)){
@@ -14,10 +18,12 @@ $this->headTitle($title);
 
 <div id="audioWrapper">
 <?php echo '<input type="hidden" id="filePath" value="' . '/uploads' . $version->getUrl() . '"/>';?>
+<?php echo '<input type="hidden" id="songTitle" value="' . $this->song->getName() . '"/>';?>
 <?php if($version->getUrl() != null):?>
 <div id="audioPlayerContainer">
-<div id="jquery_jplayer_1" class="jp-jplayer"></div>
+  
   <div id="jp_container_1" class="jp-audio">
+  <div id="jquery_jplayer_1" class="jp-jplayer"></div>
     <div class="jp-type-single">
       <div class="jp-gui jp-interface">
         <ul class="jp-controls">
@@ -45,9 +51,9 @@ $this->headTitle($title);
           </ul>
         </div>
       </div>
-      <div class="jp-title">
+      <div class="jp-details">
         <ul>
-          <li><?php echo $this->song->getName();?></li>
+          <li><span class="jp-title"></span></li>
         </ul>
       </div>
       <div class="jp-no-solution">
@@ -56,6 +62,7 @@ $this->headTitle($title);
       </div>
     </div>
   </div>
+  <div id="jplayer_inspector_1"></div>
 </div>
 <?php endif;?>
 </div>
@@ -75,9 +82,12 @@ $this->headTitle($title);
     echo '<br>';
     echo '<p>Description<br>' . $this->song->getDescription() . '</p>';
     echo '<p>Notes<br>' . $this->song->getNotes() . '</p>';
-    // echo '<hr>';
-    // echo '<p>Version Comments<br></p>';
-    // echo '<p>'.$this->song->getVersions()->first()->getComments().'</p>';
+    echo '<hr>';
+    echo '<p>Version Comments<br></p>';
+    echo '<p>'.$this->song->getVersions()->first()->getComments().'</p>';
+    if (!isset($this->author)){
+        echo '<p><a href="'.$this->url('fellowship',array('action'=>'like','id'=>$this->song->getId())).'">Like</a> this project!</p>';
+    }
     ?>
 </div>
 <div id="authorWrapper">
@@ -107,4 +117,7 @@ $this->headTitle($title);
     <br>
     <br>
 </div>
-
+<div>
+    <input type="hidden" id="h_author" value="<?php echo (isset($this->author))?"1":"0";?>"></input>
+    <input type="hidden" id="h_time" value="<?php echo $this->playerTime;?>"></input>
+</div>

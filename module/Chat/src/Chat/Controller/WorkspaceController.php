@@ -31,9 +31,9 @@ class WorkspaceController extends AbstractActionController
         $user = $objectManager->find('Application\Entity\Users', $id);
         
         $this->_view = new ViewModel();
-        $profileTypes = $user->getProfile_types()->toArray();
+        $roles = $user->getRoles()->toArray();
         
-        $this->_view->setVariable('profileTypes', $profileTypes);
+        $this->_view->setVariable('roles', $roles);
     	return $this->_view;
     }
     

@@ -1,7 +1,10 @@
 <?php
 $title = 'Profile homepage';
 $this->headTitle($title);
-$user = $this->zfcUserIdentity()->getId();
+$logUserId = $this->zfcUserIdentity()->getId();
+$logUser = $this->zfcUserIdentity();
+//echo $logUserId;
+//var_dump($logUser);
 ?>
 
 
@@ -14,7 +17,8 @@ $user = $this->zfcUserIdentity()->getId();
 <?php 
 //var_dump($this->user);
 if($this->profile->getProfile_picture_url()!=null)
-    echo '<img src="'.$this->profile->getProfile_picture_url().'" height="100px" width="100px"></img>';
+    echo '<a href="'.$this->url('avatar',array('action'=>'upload')).'"><img src="'
+    .$this->profile->getProfile_picture_url().'" height="100px" width="100px"></img></a>';
 else{
 	if($this->profile->getGravatarEmail()!=null){
 		echo $this->gravatar($this->profile->getGravatarEmail());
@@ -24,6 +28,7 @@ else{
      ?>
 
 </div>
+<div id="fields" class="col-md-5">
 <h3><?php 
 
 //$profile = $this->user->getUserProfile(); 
@@ -32,46 +37,93 @@ echo $this->profile->getDisplayname();
 
 ?></h3>
 <p>
-<?php 
-/**$profarray = $this->profile->getArrayCopy();
-foreach($profarray as $key => $value){
-	if(gettype($value)!="object")
-        echo $key.": ".$value."</br>";
-}
-**/
-?>
+
 <?php 
 //echo $this->user->getDisplayname().'<br>';
 echo $this->profile->getFirst_name().' '.$this->profile->getLast_name().'<br>';
-echo $this->profile->getBirthdate().'<br>';
 echo $this->profile->getCountry()->getCountry_name().'<br>';
 echo $this->profile->getBiography().'<br>';
 echo $this->profile->getFacebook_link().'<br>';
 echo $this->profile->getTwitter_link().'<br>';
 echo $this->profile->getWebpage().'<br>';
+
+if($logUserId != $this->user->getId()){
+    if($this->user->hasFollower($logUser)){
+	    echo '<a href="'.$this->url('fellowship',array('action'=>'unfollow','id'=>$this->user->getId())).'">Unfollow!</a>';
+        //echo '<a href="'.$this->url('zfcuser/unfollow/'.$this->user->getId()).'">Unfollow!</a>';
+	}else{
+		echo '<a href="'.$this->url('fellowship',array('action'=>'follow','id'=>$this->user->getId())).'">Follow!</a>';
+	}
+}
 echo '<hr>';
 echo '<h3>Samples</h3>';
 
 foreach($this->samples as $song){
-	echo '<a href="'.$this->url('song',array('action'=>'view','id'=>$song->getId())).'">'.$song->getName().
-	'</a> - '.$song->getSampleType().' - '.$song->getVersions()->first()->getCreated()->format('Y-m-d').'<br>';
+    if ($song->getActive() == 1) {
+        if(sizeof($song->getVersions())>0){
+        	echo '<a href="'.$this->url('song',array('action'=>'view','id'=>$song->getId())).'">'.$song->getName().
+        	'</a> - '.$song->getSampleType().' - '.$song->getVersions()->first()->getCreated()->format('Y-m-d').
+        	'<br>';
+        }
+    }
 }
 echo '<hr>';
-echo '<h3>Projects in progress</h3>';
+/*echo '<h3>Projects in progress</h3>';
 foreach($this->projects as $song){
-	echo '<a href="'.$this->url('song',array('action'=>'view','id'=>$song->getId())).'">'.$song->getName().
-	'</a>'.' - '.$song->getVersions()->first()->getCreated()->format('Y-m-d').'<br>';
+    if(sizeof($song->getVersions())>0){
+    	echo '<a href="'.$this->url('song',array('action'=>'view','id'=>$song->getId())).'">'.$song->getName().
+    	'</a>'.' - '.$song->getVersions()->first()->getCreated()->format('Y-m-d').
+    	'<br>';
+    }
 }
-echo '<hr>';
+echo '<hr>';*/
 echo '<h3>Finished Projects</h3>';
 foreach($this->finishedProjects as $song){
-	echo '<a href="'.$this->url('song',array('action'=>'view','id'=>$song->getId())).'">'.$song->getName().
-	'</a>'.$song->getVersions()->first()->getCreated()->format('Y-m-d').' - '
-			.'<a href="'.$this->url('song',array('action'=>'view','id'=>$song->getId())).'">Buy</a>'.'<br>';
+    if ($song->getActive() == 1) {
+	   echo '<a href="'.$this->url('song',array('action'=>'view','id'=>$song->getId())).'">'.$song->getName().
+	   '</a> - '.$song->getVersions()->first()->getCreated()->format('Y-m-d').
+	   ($logUserId != $this->user->getId()?'<a href="'.$this->url('store',array('action'=>'buy','id'=>$song->getId())).'">Buy</a>':'').
+	   '<br>';
+	}
 }
 ?>
 </p>
 
+</div>
+<?php 
+    if($logUserId == $this->user->getId()){
+?>
+<div style="width: 330px; height: 500px;" class="col-md-5">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title"><?php echo $this->translate('Friends!') ?></h3>
+        </div>
+        <div class="panel-body">
+            <p>Following:<br>
+                <ul>
+                <?php foreach ($this->user->getFollows() as $follow){
+                    echo '<li><a href="'.$this->url('profile',array('action'=>'index','id'=>$follow->getId())).'">'.$follow->getUsername().'</a></li>';
+                }?>
+                </ul>
+            </p>
+            <p>Followed By:<br>
+                <ul>
+                <?php foreach ($this->user->getFollowedBy() as $follow){
+                    echo '<li><a href="'.$this->url('profile',array('action'=>'index','id'=>$follow->getId())).'">'.$follow->getUsername().'</a></li>';
+                }?>
+                </ul>
+            </p>
+            <p>Mutuals:<br>
+                <ul>
+                <?php foreach ($this->mutuals as $follow){
+                    echo '<li><a href="'.$this->url('profile',array('action'=>'index','id'=>$follow->getId())).'">'.$follow->getUsername().'</a></li>';
+                }?>
+                </ul>
+            </p>
+        </div>
+    </div>
+</div>
+<?php }?>
 </div>
 </div>
 

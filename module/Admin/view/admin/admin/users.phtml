@@ -1,0 +1,42 @@
+<?php
+$title = 'Admin - Roles';
+$this->headTitle($title);
+?>
+<h1><?php echo $this->escapeHtml($title); ?></h1>
+<div>
+<table class="table">
+     <tr>
+         <th>Username</th>
+         <th>Display Name</th>
+         <th>Created</th>
+         <th>Roles</th>
+         <th>&nbsp;</th>
+     </tr>
+     <?php foreach ($this->paginator as $user) : // <-- change here! ?>
+         <tr>
+             <td><?php echo $this->escapeHtml($user->getUsername());?></td>
+             <td><?php echo $this->escapeHtml($user->getDisplayName());?></td>
+             <td><?php echo $this->escapeHtml($user->getCreated()->format('Y-m-d H:i:s'));?></td>
+             <td><?php 
+                foreach ($user->getRoles() as $role){
+                	echo $this->escapeHtml($role->getRole_name()).'<br>';
+                }
+             
+             
+             ?></td>
+             <td>
+                 <a href="<?php echo $this->url('zfcadmin/role',
+                     array('act' => 'add', 'id' => $user->getId()));?>">Add Role</a>
+                 <a href="<?php echo $this->url('zfcadmin/role',
+                     array('act' => 'rem', 'id' => $user->getId()));?>">Remove Role</a>
+             </td>
+         </tr>
+     <?php endforeach; ?>
+ </table>
+<?php ///* 
+echo $this->paginationControl(
+    $this->paginator, 'Sliding', 'pagination/sliding', array('route'=>'zfcadmin','action'=>'users')
+);
+      //*/
+?>
+</div>

@@ -1,17 +1,10 @@
-body {
-    padding-top: 52px;
-    padding-bottom: 40px;
-    background: white url(/img/bg1.png) repeat;;
-    color: black;
+body{
+	
+	/*background: white url(/img/bg1.png) repeat;*/
 }
 
-#wrapper
-{
-	overflow: hidden;
-	width: 1200px;
-	margin: 0px auto;
-	background: #FFFFFF;
-	box-shadow: 0px 0px 20px rgba(0,0,0,.3);
+#wrapper{
+padding-top: 52px;
 }
 
 .zf-green {

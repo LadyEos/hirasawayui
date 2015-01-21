@@ -10,6 +10,8 @@ class SongCategoriesService implements ServiceLocatorAwareInterface{
     
     protected $em;
     protected $category;
+    protected $oMService;
+    protected $entity = 'Application\Entity\SongCategories';
     /**
      * Set the service locator.
      *
@@ -41,13 +43,13 @@ class SongCategoriesService implements ServiceLocatorAwareInterface{
     }
     
     public function findCategory($id){
-    	$objectManager = $this->getServiceLocator()->get('Application\Service\DoctrineOMService');
+    	$objectManager = $this->getOMService();
     	
-    	return $objectManager->find('Application\Entity\SongCategories', $id);
+    	return $objectManager->find($this->entity, $id);
     }
     
     public function findCategoryByName($key){
-    	$query = $this->getEntityManager()->createQuery('SELECT sc FROM Application\Entity\SongCategories sc 
+    	$query = $this->getEntityManager()->createQuery('SELECT sc FROM '.$this->entity.' sc 
     				        WHERE sc.category_name = :key');
     	$query->setParameter('key', $key);
     	$category = $query->getResult();
@@ -63,7 +65,14 @@ class SongCategoriesService implements ServiceLocatorAwareInterface{
     	return $this->em;
     }
     
-	
+    private function getOMService()
+    {
+    	if (! $this->oMService) {
+    		$this->oMService = $this->getServiceLocator()->get('Application\Service\DoctrineOMService');
+    	}
+    
+    	return $this->oMService;
+    }
 
     
     

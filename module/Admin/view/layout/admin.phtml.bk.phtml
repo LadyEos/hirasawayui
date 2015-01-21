@@ -1,0 +1,74 @@
+<?php echo $this->doctype(); ?>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <?php echo $this->headTitle('ZfcAdmin - Zend Framework 2 Admin Interface')->setSeparator(' - ')->setAutoEscape(false) ?>
+
+    <?php echo $this->headMeta()->appendName('viewport', 'width=device-width, initial-scale=1.0') ?>
+
+    <!-- Le styles -->
+    <?php echo $this->headLink()->prependStylesheet('//netdna.bootstrapcdn.com/twitter-bootstrap/2.1.1/css/bootstrap-combined.min.css')
+
+            ->prependStylesheet($this->basePath() . '/css/jquery-ui.min.css')
+            ->prependStylesheet($this->basePath() . '/css/bootstrap-theme.min.css')
+            ->prependStylesheet($this->basePath() . '/css/bootstrap.min.css') ?>
+
+    <!-- Scripts -->
+    <?php echo $this->headScript()->prependFile('//netdna.bootstrapcdn.com/twitter-bootstrap/2.1.1/js/bootstrap.min.js')
+                                  ->prependFile('//code.jquery.com/jquery.min.js')
+                                  ->prependFile($this->basePath() . '/js/jquery-ui.min.js')
+                                  ->prependFile($this->basePath() . '/js/respond.min.js', 'text/javascript', array(
+                                  		'conditional' => 'lt IE 9'
+                                  ))
+                                  ->prependFile('//html5shiv.googlecode.com/svn/trunk/html5.js', 'text/javascript', array('conditional' => 'lt IE 9',)); ?>
+
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="<?php echo $this->url('zfcadmin') ?>">ZfcAdmin</a>
+          <div class="nav-collapse">
+            <?php echo $this->navigation()
+                            ->menu('navigation')
+                            ->setUlClass('nav')
+                            ->setMaxDepth(0)
+                            ->setRenderInvisible(false)?>
+            <?php //echo '<a href="'.$this->url('zfcadmin/users').'">Users</a>';?>
+            <?php //echo '<a href="'.$this->url('zfcadmin/songs').'">Songs</a>';?>
+          </div> <!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+    <br>
+    <br>
+    <div class="container">
+
+<?php
+     echo $this->navigation('navigation') // <-- Update this!!
+               ->breadcrumbs()
+               ->setMinDepth(0)
+               ->setPartial(array('partial/breadcrumb.phtml', 'Application'));
+     ?>
+      <?php echo $this->content; ?>
+
+      <hr>
+
+      <footer>
+        <p>&copy; 2005 - 2012 by Zend Technologies Ltd. All rights reserved.</p>
+      </footer>
+
+    </div> <!-- /container -->
+
+  <?php echo $this->inlineScript() ?>
+  </body>
+</html>

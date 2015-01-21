@@ -6,7 +6,7 @@ $this->headTitle($title);
 <div class="page-header">
     <h1><?php echo $this->translate($title); ?></h1>
 </div>
-<div class="container">
+<div class="container" style="width: 100%;">
     <div class="row">
         <div style="width: 330px; height: 500px;" class="col-md-5">
             <div class="panel panel-default">
@@ -15,19 +15,24 @@ $this->headTitle($title);
                 </div>
                 <div class="panel-body">
                     <p>
-                        <ul>
+                        
                             <?php 
-                                if(isset($this->profileTypes)){
-                                    foreach ($this->profileTypes as $profile){
-                            ?>
-                            <li><?php echo sprintf($profile->getProfile_name());?></li>
-                            <?php } 
+                                if(isset($this->roles)){
+                                    
+                                    foreach ($this->roles as $role){
+                                        if($role->getRoleId()!='user'){
+                                        	echo '<li>';
+                                        	echo sprintf($role->getRole_name());
+                                        	echo '</li>';
+                                        }
+                                    } 
+                                    echo '</ul>';
                                 }else 
                                     echo "You have no roles yet";
                             ?>
-                        </ul>
+                        
                     </p>
-                    <p>You can add or change roles <a href="<?php echo $this->url('profile',array('action'=>'edit'));?>">here</a>.</p>
+                    <p>You can add or change roles <a href="<?php echo $this->url('zfcuser/chooserole');?>">here</a>.</p>
                 </div>
             </div>
         </div>
@@ -39,19 +44,19 @@ $this->headTitle($title);
                 <div class="panel-body">
                     <p>
                         <?php 
-                            if(isset($this->profileTypes)){
-                                foreach ($this->profileTypes as $profile){
-                                    if($profile->getProfile_key()=='PLy'){
+                            if(isset($this->roles)){
+                                foreach ($this->roles as $role){
+                                    if($role->getRole_key()=='PLy'){
                         ?>
                         <a href="<?php echo $this->url('song',array('action'=>'add','type'=>'sample','name'=>'lyrics')) ?>"><?php echo $this->translate('upload sample Lyrics') ?></a><br>
                         <?php 
                             }
-                            if($profile->getProfile_key()=='PVo'){
+                            if($role->getRole_key()=='PVo'){
                         ?>
                         <a href="<?php echo $this->url('song',array('action'=>'add','type'=>'sample','name'=>'vocal')) ?>"><?php echo $this->translate('upload sample Vocal') ?></a><br>
                         <?php
                              } 
-                             if($profile->getProfile_key()=='PCo'){
+                             if($role->getRole_key()=='PCo'){
                         ?>
                         <a href="<?php echo $this->url('song',array('action'=>'add','type'=>'sample','name'=>'score')) ?>"><?php echo $this->translate('upload sample Score') ?></a><br>
                         <?php 
@@ -64,9 +69,30 @@ $this->headTitle($title);
                         
                         </p>
                     <p>
-                        <a href="<?php echo $this->url('song',array('action'=>'add')) ?>"><?php echo $this->translate('single author project (audio)') ?></a><br>
+                        <?php 
+                            if(isset($this->roles)){
+                                foreach ($this->roles as $role){
+                                    if($role->getRole_key()=='PLy'){
+                        ?>
                         <a href="<?php echo $this->url('song',array('action'=>'add','name'=>'lyrics')) ?>"><?php echo $this->translate('single author project (lyrics)') ?></a><br>
+                        
+                        <?php 
+                            }
+                            if($role->getRole_key()=='PVo' || $role->getRole_key()=='PCo'){
+                        ?>
+                        <a href="<?php echo $this->url('song',array('action'=>'add')) ?>"><?php echo $this->translate('single author project (audio)') ?></a><br>
+                        <?php 
+                                    }
+                                } 
+                            }else 
+                                echo "You need at least a role to begin working!";
+                        ?>
                     </p>
+                    <p>
+                        <a href="<?php echo $this->url('album',array('action'=>'add')) ?>"><?php echo $this->translate('Create Album') ?></a><br>
+                        <a href="<?php echo $this->url('album',array('action'=>'index')) ?>"><?php echo $this->translate('Go to Album Central') ?></a><br>
+                    </p>
+                    
                 </div>
             </div>
         </div>
@@ -81,26 +107,58 @@ $this->headTitle($title);
                         <?php echo '<h3>Samples</h3>';
 
                         foreach($this->samples as $song){
-                        	echo '<a href="'.$this->url('song',array('action'=>'view','id'=>$song->getId())).'">'.$song->getName().
-                        	'</a> - '.$song->getSampleType().' - '.$song->getVersions()->first()->getCreated()->format('Y-m-d').
-                        	' - <a href="'.$this->url('song',array('action'=>'edit','id'=>$song->getId())).'">Edit</a>'.
-                        	' - <a href="'.$this->url('version',array('action'=>'add','id'=>$song->getId())).'">Add Version</a>'.
-                        	'<br>';
+                            if ($song->getActive() == 1) {
+                            	if(sizeof($song->getVersions())>0){
+                                    echo '<a href="'.$this->url('song',array('action'=>'view','id'=>$song->getId())).'">'.$song->getName().
+                                	'</a> - '.$song->getSampleType().' - '.$song->getVersions()->first()->getCreated()->format('Y-m-d').
+                                	' - <a href="'.$this->url('song',array('action'=>'edit','id'=>$song->getId())).'">Edit</a>'.
+                                	' - <a href="'.$this->url('version',array('action'=>'add','id'=>$song->getId())).'">Add Version</a>'.
+                                	'- <a href="'.$this->url('song',array('action'=>'complete','id'=>$song->getId())).'">Finish</a>'.
+                                	' - <a href="'.$this->url('song',array('action'=>'delete','id'=>$song->getId())).'">Delete</a>'.
+                                	'<br>';
+                                }else{
+                                	echo '<span style="color:red;font-weight:bold"><a href="'.$this->url('song',array('action'=>'view','id'=>$song->getId())).'">'.$song->getName().
+                                    '</a> - '.$song->getSampleType().' - NO AUDIO FILE'.
+                                    ' - <a href="'.$this->url('song',array('action'=>'edit','id'=>$song->getId())).'">Edit</a>'.
+                                    ' - <a href="'.$this->url('version',array('action'=>'add','id'=>$song->getId())).'">Add Version</a>'.
+                                    '- <a href="'.$this->url('song',array('action'=>'complete','id'=>$song->getId())).'">Finish</a>'.
+                                    ' - <a href="'.$this->url('song',array('action'=>'delete','id'=>$song->getId())).'">Delete</a>'.
+                                    '</span><br>';
+                                }
+                        	}
                         }
                         echo '<hr>';
                         echo '<h3>Projects in progress</h3>';
                         foreach($this->projects as $song){
-                        	echo '<a href="'.$this->url('song',array('action'=>'view','id'=>$song->getId())).'">'.$song->getName().
-                        	'</a>'.' - '.$song->getVersions()->first()->getCreated()->format('Y-m-d').
-                        	' - <a href="'.$this->url('song',array('action'=>'edit','id'=>$song->getId())).'">Edit</a>'.
-                        	' - <a href="'.$this->url('version',array('action'=>'add','id'=>$song->getId())).'">Add Version</a>'.'<br>';
+                            if ($song->getActive() == 1) {
+                                if(sizeof($song->getVersions())>0){
+                                	echo '<a href="'.$this->url('song',array('action'=>'view','id'=>$song->getId())).'">'.$song->getName().
+                                	'</a>'.' - '.$song->getVersions()->first()->getCreated()->format('Y-m-d').
+                                	' - <a href="'.$this->url('song',array('action'=>'edit','id'=>$song->getId())).'">Edit</a>'.
+                                	' - <a href="'.$this->url('version',array('action'=>'add','id'=>$song->getId())).'">Add Version</a>'.
+                                	'- <a href="'.$this->url('song',array('action'=>'complete','id'=>$song->getId())).'">Finish</a>'.
+                                	' - <a href="'.$this->url('song',array('action'=>'delete','id'=>$song->getId())).'">Delete</a>'.
+                                	'<br>';
+                        	    }else{
+                                	echo '<span style="color:red;font-weight:bold"><a href="'.$this->url('song',array('action'=>'view','id'=>$song->getId())).'">'.$song->getName().
+                                	'</a>'.' - NO AUDIO FILE'.//$song->getVersions()->first()->getCreated()->format('Y-m-d').
+                                	' - <a href="'.$this->url('song',array('action'=>'edit','id'=>$song->getId())).'">Edit</a>'.
+                                	' - <a href="'.$this->url('version',array('action'=>'add','id'=>$song->getId())).'">Add Version</a>'.
+                                	' - <a href="'.$this->url('song',array('action'=>'delete','id'=>$song->getId())).'">Delete</a>'.
+                                    '</span><br>';
+                                }
+                            }
                         }
                         echo '<hr>';
                         echo '<h3>Finished Projects</h3>';
                         foreach($this->finishedProjects as $song){
-                        	echo '<a href="'.$this->url('song',array('action'=>'view','id'=>$song->getId())).'">'.$song->getName().
-                        	'</a>'.$song->getVersions()->first()->getCreated()->format('Y-m-d').' - '
-                        			.'<a href="'.$this->url('song',array('action'=>'view','id'=>$song->getId())).'">Buy</a>'.'<br>';
+                            if ($song->getActive() == 1) {
+                            	echo '<a href="'.$this->url('song',array('action'=>'view','id'=>$song->getId())).'">'.$song->getName().
+                            	'</a> '.$song->getVersions()->first()->getCreated()->format('Y-m-d').' - '
+                            	.'<a href="'.$this->url('song',array('action'=>'view','id'=>$song->getId())).'">View</a>'.
+                            	' - <a href="'.$this->url('song',array('action'=>'delete','id'=>$song->getId())).'">Delete</a>'.
+                            	'<br>';
+                        	}
                         }
                         ?>
                     </p>

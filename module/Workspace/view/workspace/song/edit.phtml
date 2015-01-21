@@ -77,8 +77,26 @@ echo $this->form()->closeTag() ?>
                 <h3 class="panel-title"><?php echo $this->translate('Collaborate!') ?></h3>
             </div>
             <div class="panel-body">
+                <?php if($this->song->getUsers()->count() > 1){
+                    ?>
+                    <p>
+                    Currently this project is authored by you and the following collaborators:
+                    <ul>
+                   <?php foreach($this->song->getUsers() as $author){
+                        if($author->getId() != $this->zfcUserIdentity()->getId()){
+                       ?>
+                
+                        <li><?php echo $author->getUsername() ?></li>
+                    
+                <?php 	
+                    }}?>
+                    </ul>
+                    <p><?php echo sprintf($this->translate('add more people to help you!')) ?></p>
+                </p>
+                  <?php }else{?>
                 <p><?php echo sprintf($this->translate('add people to help you!')) ?></p>
-                <p><a class="btn btn-success pull-right" href="<?php echo $this->url('song',array('action'=>'upload'))?>"><?php echo $this->translate('Collaborate') ?> &raquo;</a></p>
+                <?php }?>
+                <p><a class="btn btn-success pull-right" href="<?php echo $this->url('song',array('action'=>'collaboration','id'=>$this->song->getId()));?>"><?php echo $this->translate('Collaborate') ?> &raquo;</a></p>
             </div>
         </div>
      </div>

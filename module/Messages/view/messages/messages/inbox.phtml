@@ -1,0 +1,46 @@
+<?php
+$title = 'Inbox';
+$this->headTitle($title);
+$loggedFlag = false;
+
+/**
+ * TODO: CSS for unread messages, unread message count
+ */
+?>
+<h1><?php echo $this->escapeHtml($title); ?></h1>
+<div>
+
+<br>
+<div>
+<a href="<?php echo $this->url('messages',array('action'=>'send'))?>">Send A Message</a> -
+<a href="<?php echo $this->url('messages',array('action'=>'outbox'))?>">Outbox</a> -
+</div>
+
+<table class="table">
+     <tr>
+         <th>Sender</th>
+         <th>Subject</th>
+         <th>Date</th>
+         <th>&nbsp;</th>
+     </tr>
+     <?php foreach ($this->paginator as $message) : // <-- change here! ?>
+         <?php if(!$message->getDeleted()):?>
+         <tr>
+             
+             <td><?php echo $this->escapeHtml($message->getSender()->getUsername());?></td>
+             <td><?php echo $this->escapeHtml($message->getSubject());?></td>
+             <td><?php echo $this->escapeHtml($message->getSent()->format('Y-m-d H:i:s'));?></td>
+             
+             <td><a href="<?php echo $this->url('messages',array('action'=>'view','id'=>$message->getId()));?>">Read</a>-
+             <a href="<?php echo $this->url('messages',array('action'=>'delete','id'=>$message->getId()));?>">Delete</a></td>
+         </tr>
+         <?php endif;?>
+     <?php endforeach; ?>
+ </table>
+    <?php ///* 
+echo $this->paginationControl(
+    $this->paginator, 'Sliding', 'pagination/sliding', array('route'=>'messages','action'=>'inbox')
+);
+      //*/
+?>
+</div>

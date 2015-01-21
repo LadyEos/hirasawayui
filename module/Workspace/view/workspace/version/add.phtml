@@ -1,15 +1,29 @@
+
+
 <?php
 $title = $this->song->getName();
-$this->headTitle($title);
+$this->headTitle($title. ' STEP 2');
 ?>
 <h1><?php echo $this->escapeHtml($title); ?></h1>
+
+
+<?php 
+if($this->tempFile != null)
+    var_dump($this->tempFile);
+if($this->errors!= null)
+    var_dump($this->errors);
+?>
+
+
+
 <?php
  
 $form->prepare();
 //$form->setAttribute('action', 'upload');
 //$form->setAttribute('method', 'post');
 
- echo 'Last version number used: '.$this->song->getVersions()->first()->getVersion();
+ //echo 'Last version number used: '.$this->song->getVersions()->first()->getVersion();
+
  echo $this->form()->openTag($form);
  ?>
 
@@ -55,11 +69,7 @@ $form->prepare();
   
  <?php
 endforeach;
-echo $this->form()->closeTag() ?>
+echo $this->form()->closeTag();
+echo $this->errors; ?>
 
-<?php 
-if($this->tempFile != null)
-    var_dump($this->tempFile);
-if($this->errors!= null)
-    var_dump($this->errors);
-?>
+

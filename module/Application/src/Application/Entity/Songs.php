@@ -13,7 +13,7 @@ class Songs {
 	/** @ORM\Column(type="string", length=30) */
 	protected $name;
 	
-	/** @ORM\Column(type="boolean", length=1) */
+	/** @ORM\Column(type="boolean", length=1, nullable=TRUE) */
 	protected $completed;
 	
 	/** @ORM\Column(type="boolean", length=1) */
@@ -34,9 +34,14 @@ class Songs {
 	/** @ORM\Column(type="datetime") */
 	protected $created;
 	
-	/**
-	 * @ORM\OneToMany(targetEntity="SoldSongs", mappedBy="songs")
+	/*/**
+	 * @ORM\ManyToOne(targetEntity="SoldSongs", mappedBy="songs")
 	 **/
+	//protected $sold;
+	
+	/**
+	 * @ORM\ManyToMany(targetEntity="Payments", mappedBy="songs")
+	**/
 	protected $sold;
 	
 	/**
@@ -63,15 +68,31 @@ class Songs {
 	protected $likes;
 	
 	/**
-	 * @ORM\ManyToOne(targetEntity="Albums", inversedBy="songs")
-	 * @ORM\JoinColumn(name="album_id", referencedColumnName="id")
-	 **/
+     * @ORM\ManyToMany(targetEntity="Application\Entity\Albums", inversedBy="songs")
+     * @ORM\JoinTable(name="AlbumSongs",
+     *      joinColumns={@ORM\JoinColumn(name="song_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="album_id", referencedColumnName="id")}
+     *      )
+     * @ORM\OrderBy({"created" = "DESC"})
+     **/
 	protected $albums;
 	
 	/**
 	 * @ORM\ManyToMany(targetEntity="Users", mappedBy="songs")
 	 */
 	protected $users;
+	
+	/**
+	 * @ORM\OneToMany(targetEntity="Prices", mappedBy="song")
+	 * @ORM\OrderBy({"created" = "DESC"})
+	 **/
+	protected $price;
+	
+	/**
+	 * @ORM\OneToMany(targetEntity="Downloads", mappedBy="song")
+	 * @ORM\OrderBy({"created" = "DESC"})
+	 **/
+	protected $downloads;
 
 
 	public function __construct(){
@@ -81,6 +102,8 @@ class Songs {
 		$this->versions = new \Doctrine\Common\Collections\ArrayCollection();
 		$this->likes = new \Doctrine\Common\Collections\ArrayCollection();
 		$this->users = new \Doctrine\Common\Collections\ArrayCollection();
+		$this->price = new \Doctrine\Common\Collections\ArrayCollection();
+		$this->downloads = new \Doctrine\Common\Collections\ArrayCollection();
 	}
 
 	// getters/setters
@@ -201,6 +224,13 @@ class Songs {
 		$this->active = $active;
 	}
 	
+	public function getPrice(){
+		return $this->price;
+	}
+	
+	public function setPrice($price){
+		$this->price = $price;
+	}
 	
 	/**
 	 * Convert the object to an array.
@@ -311,5 +341,66 @@ class Songs {
 	}
 
 	/* end Languages methods */
+	
+	
+	
+	public function wasBought (Payments $boughtSongs) {
+		$bought = array();
+		foreach ($this->getSold() as $arrMember) {
+			$bought[] = $arrMember->getId();
+		}
+		if (in_array($boughtSongs->getId(), $bought))    //check if the supplied language is to be removed or not
+			return true;
+	}
+	
+	public function unsetBought (Payments $boughtSongs) {
+		$this->sold->removeElement($boughtSongs);
+	}
+	
+	public function setBought (Payments $boughtSongs) {
+		$this->sold[] = $boughtSongs;
+	}
+	
+	
+    public function hasPrice(Prices $price) {
+		$prices = array();
+		foreach ($this->getPrice() as $arrMember) {
+			$prices[] = $arrMember->getAmount();
+		}
+		if (in_array($price->getAmount(), $prices))    //check if the supplied language is to be removed or not
+			return true;
+		else
+			return false;
+	}
+	
+	public function addPrice (Prices $price) {
+		$price->setSong($this);
+	    $this->price[] = $price;
+	}
+	
+	public function getLastPrice(){
+		return $this->price[0];
+	}
+	
+	
+	public function hasAlbum (Albums $album) {
+		$albums = array();
+		foreach ($this->getAlbums() as $arrMember) {
+			$albums[] = $arrMember->getName();
+		}
+		if (in_array($album->getName(), $albums))
+			return true;
+	}
+	
+	public function unsetAlbum (Albums $album) {
+		$this->albums->removeElement($album);
+	}
+	
+	public function setAlbum (Albums $album) {
+		$this->albums[] = $album;
+	}
+	
+	
+	
 	
 }

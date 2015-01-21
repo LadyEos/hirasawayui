@@ -7,13 +7,24 @@ return array(
         'DoctrineORMModule',
         'ZfcBase',
         'ZfcUser',
+        //'GoalioRememberMe',
+        //'GoalioRememberMeDoctrineORM',
         'ZfcUserDoctrineORM',
         'ZfcTwitterBootstrap',
+        'ZfcAdmin',
+        'BjyAuthorize',
         'Application',
-        //'Oldish',                  // <-- Add this line
+        'ShoppingCart',
+        //'SpeckPaypal',
+        //'Oldish',
+        'Admin',                  // <-- Add this line
         'Users',
         'Avatar',
         'Workspace',
+        'Store',
+        'Admin',
+        'Search',
+        'Messages'
     ),
 
     // These are various options for the listeners attached to the ModuleManager

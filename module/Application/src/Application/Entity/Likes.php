@@ -21,9 +21,12 @@ class Likes {
 	 * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
 	 **/
 	protected $users;
+	
+	/** @ORM\Column(type="datetime") */
+	protected $created;
 
 	public function __construct(){
-		$this->date = new \DateTime();
+		$this->created = new \DateTime();
 		
 	}
 

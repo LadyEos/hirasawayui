@@ -4,7 +4,8 @@ return array(
         'invokables' => array(
             'Workspace\Controller\Workspace' => 'Workspace\Controller\WorkspaceController',
             'Workspace\Controller\Song' => 'Workspace\Controller\SongController',
-            'Workspace\Controller\Version' => 'Workspace\Controller\VersionController'
+            'Workspace\Controller\Version' => 'Workspace\Controller\VersionController',
+            'Workspace\Controller\Album' => 'Workspace\Controller\AlbumController'
         )
     ),
     'router' => array(
@@ -55,6 +56,21 @@ return array(
     				),
     				'defaults' => array(
 						'controller' => 'Workspace\Controller\Version',
+						'action' => 'index'
+    				)
+        		),
+        		'may_terminate' => true
+            ),
+            'album' => array(
+        		'type' => 'segment',
+        		'options' => array(
+    				'route' => '/album[/][:action][/:id]',
+    				'constraints' => array(
+						'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+						'id' => '[0-9]+'
+    				),
+    				'defaults' => array(
+						'controller' => 'Workspace\Controller\Album',
 						'action' => 'index'
     				)
         		),

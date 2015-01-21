@@ -1,0 +1,171 @@
+<!--  <script>
+  //var songs = jQuery.parseJSON('<?php //echo json_encode($this->playlist) ?>');
+</script>-->
+  <?php //var_dump($this->playlist);?>
+<?php
+$this->headLink()->appendStylesheet($this->basePath() . '/css/blue.monday/jplayer.blue.monday.css');
+$this->headScript()->appendFile($this->basePath($this->basePath() .'/js/jQuery.jPlayer.2.6.0/jquery.jplayer.min.js'));
+$this->headScript()->appendFile($this->basePath($this->basePath() .'/js/jQuery.jPlayer.2.6.0/add-on/jplayer.playlist.min.js'));
+$this->headScript()->appendFile($this->basePath($this->basePath() .'/js/jQuery.jPlayer.2.6.0/add-on/jquery.jplayer.inspector.js'));
+//$this->headScript()->appendFile($this->basePath('js/musicplayerplaylist.js'));
+?>
+
+<script>
+$(document).ready(function(){
+
+	var songs = jQuery.parseJSON('<?php echo json_encode($this->playlist) ?>');
+	var myPlaylist = new jPlayerPlaylist({
+		jPlayer: "#jquery_jplayer_1",
+		cssSelectorAncestor: "#jp_container_1"
+	}, jQuery.parseJSON('<?php echo json_encode($this->playlist) ?>'), 
+
+	{
+		playlistOptions: {
+			enableRemoveControls: true,
+			free:false
+		},
+		swfPath: "/js/jQuery.jPlayer.2.6.0/",
+		supplied: "mp3",
+		smoothPlayBar: true,
+		keyEnabled: true,
+		audioFullScreen: true,
+		oggSupport:false
+	});
+  
+	$("#jplayer_inspector_1").jPlayerInspector({jPlayer:$("#jquery_jplayer_1")});
+
+	<?php if(!isset($this->author) || $this->playerTime != 0){?>
+    //$("#jquery_jplayer_1").setMedia(songs);
+	$("#jquery_jplayer_1").bind($.jPlayer.event.timeupdate, function(event) {
+		  if(event.jPlayer.status.currentTime > <?php echo $this->playerTime;?>) {
+		    $(this).jPlayer("pause");
+		    myPlaylist.next();
+		  }
+		  
+	});
+	<?php }?>
+
+	//var str = JSON.stringify(songs, undefined, 2);
+	//$("#dump").html("<span>"+str+"</span>");
+});
+</script>
+
+
+
+<?php
+
+$title = $this->album->getName();
+$this->headTitle($title);
+
+$playlist = $this->album->getSongs();
+$version = $playlist->first()
+    ->getVersions()
+    ->first();
+$current = $playlist->first();
+
+?>
+
+
+<h1><?php echo $this->escapeHtml($title); ?></h1>
+<div>
+
+	<div id="infoWrapper">
+        <?php
+        echo '<p>Description<br>' . $this->album->getDescription() . '</p>';
+        echo '<hr>';
+        if (! isset($this->author)) {
+            echo '<p><a href="' . $this->url('fellowship', array(
+                'action' => 'like',
+                'id' => $this->album->getId()
+            )) . '">Like</a> this album!</p>';
+        }
+        ?>
+    </div>
+
+    <?php echo '<input type="hidden" id="filePath" value="' . '/uploads' . $version->getUrl() . '"/>';?>
+    <?php echo '<input type="hidden" id="songTitle" value="' . $current->getName() . '"/>';?>
+
+    <div id="audioWrapper">
+
+		<div id="jp_container_1" class="jp-video jp-video-270p">
+			<div class="jp-type-playlist">
+				<div id="jquery_jplayer_1" class="jp-jplayer"></div>
+				<div class="jp-gui">
+					<div class="jp-video-play">
+						<a href="javascript:;" class="jp-video-play-icon" tabindex="1">play</a>
+					</div>
+					<div class="jp-interface">
+						<div class="jp-progress">
+							<div class="jp-seek-bar">
+								<div class="jp-play-bar"></div>
+							</div>
+						</div>
+						<div class="jp-current-time"></div>
+						<div class="jp-duration"></div>
+						<div class="jp-details">
+							<ul>
+								<li><span class="jp-title"></span></li>
+							</ul>
+						</div>
+						<div class="jp-controls-holder">
+							<ul class="jp-controls">
+								<li><a href="javascript:;" class="jp-previous" tabindex="1">previous</a></li>
+								<li><a href="javascript:;" class="jp-play" tabindex="1">play</a></li>
+								<li><a href="javascript:;" class="jp-pause" tabindex="1">pause</a></li>
+								<li><a href="javascript:;" class="jp-next" tabindex="1">next</a></li>
+								<li><a href="javascript:;" class="jp-stop" tabindex="1">stop</a></li>
+								<li><a href="javascript:;" class="jp-mute" tabindex="1" title="mute">mute</a></li>
+								<li><a href="javascript:;" class="jp-unmute" tabindex="1" title="unmute">unmute</a></li>
+								<li><a href="javascript:;" class="jp-volume-max" tabindex="1" title="max volume">max volume</a></li>
+							</ul>
+							<div class="jp-volume-bar">
+								<div class="jp-volume-bar-value"></div>
+							</div>
+							<ul class="jp-toggles">
+								<li><a href="javascript:;" class="jp-full-screen" tabindex="1" title="full screen">full screen</a></li>
+								<li><a href="javascript:;" class="jp-restore-screen" tabindex="1" title="restore screen">restore screen</a></li>
+								<li><a href="javascript:;" class="jp-shuffle" tabindex="1" title="shuffle">shuffle</a></li>
+								<li><a href="javascript:;" class="jp-shuffle-off" tabindex="1" title="shuffle off">shuffle off</a></li>
+								<li><a href="javascript:;" class="jp-repeat" tabindex="1" title="repeat">repeat</a></li>
+								<li><a href="javascript:;" class="jp-repeat-off" tabindex="1" title="repeat off">repeat off</a></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+				<div class="jp-playlist">
+					<ul>
+						<!-- The method Playlist.displayPlaylist() uses this unordered list -->
+						<li></li>
+					</ul>
+				</div>
+				<div class="jp-no-solution">
+					<span>Update Required</span>
+					To play the media you will need to either update your browser to a recent version or update your <a href="http://get.adobe.com/flashplayer/" target="_blank">Flash plugin</a>.
+				</div>
+			</div>
+		</div>
+		
+		<div id="jplayer_inspector_1"></div>
+	</div>
+	<br>
+	<div id="authorWrapper">
+        <?php
+        if (isset($this->author)) {
+            if ($this->album->getCompleted() == 0) {
+                ?>
+            
+                <a
+    			href="<?php echo $this->url('album',array('action'=>'edit','id'=>$this->album->getId())) ?>">
+                <?php echo $this->translate('Edit') ?></a> <a
+    			href="<?php echo $this->url('album',array('action'=>'delete','id'=>$this->album->getId())) ?>">
+                <?php echo $this->translate('Delete') ?></a>
+                
+        <?php
+            }
+        }
+        ?>
+        <br/> 
+        <br/>
+	</div>
+</div>
+<div id="dump"></div>

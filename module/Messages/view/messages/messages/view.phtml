@@ -1,0 +1,30 @@
+<?php 
+echo $this->inlineScript()->prependFile($this->basePath('js/profile.js'));
+
+?>
+<?php
+//var_dump($this->message);
+$title = $this->message->getSubject();
+$this->headTitle($title);
+?>
+<h1><?php echo $this->escapeHtml($title); ?></h1>
+<div>
+<table>
+    <tr>
+        <td>From:</td>
+        <td><?php echo $this->message->getSender()->getDisplayName();?> 
+        (<a href="<?php echo $this->url('profile',array('action'=>'index','id'=>$this->message->getSender()->getId()))?>">
+        <?php echo $this->message->getSender()->getUsername();?></a>)</td>
+    </tr>
+    <tr>
+        <td>Subject:</td>
+        <td><?php echo $this->message->getSubject();?></td>
+    </tr>
+    <tr>
+        <td>Message:</td>
+        <td><?php echo $this->message->getMessage();?></td>
+    </tr>
+</table>
+</div>
+<div><a href="<?php echo $this->url('messages',array('action'=>'send','id'=>$this->message->getSender()->getId()))?>">Reply</a> -
+<a href="<?php echo $this->url('messages',array('action'=>'inbox'))?>">Inbox</a> -</div>

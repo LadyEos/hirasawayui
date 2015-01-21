@@ -1,12 +1,14 @@
 <?php
 namespace Application\Entity;
+
+use BjyAuthorize\Provider\Role\ProviderInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use ZfcUser\Entity\UserInterface as User;
 
 /** @ORM\Entity */
-class Users implements User {
+class Users implements User, ProviderInterface {
     /**
     * @ORM\Id
     * @ORM\GeneratedValue(strategy="AUTO")
@@ -32,14 +34,15 @@ class Users implements User {
     /** @ORM\Column(type="boolean", length=1) */
     protected $activated;
     
-    /** @ORM\Column(type="boolean", length=1) */
-    protected $is_admin;
+    ///** @ORM\Column(type="boolean", length=1) */
+    //protected $is_admin;
     
     /** @ORM\Column(type="datetime") */
     protected $created;
     
     /** @ORM\Column(type="smallint", nullable=TRUE) */
     protected $state;
+
     
     /**
      * @ORM\ManyToMany(targetEntity="Application\Entity\Songs", inversedBy="users")
@@ -49,16 +52,17 @@ class Users implements User {
      *      )
      * @ORM\OrderBy({"created" = "DESC"})
      **/
+    
     protected $songs;
     
     /**
-     * @ORM\ManyToMany(targetEntity="Application\Entity\ProfileTypes",inversedBy="users")
-     * @ORM\JoinTable(name="UserProfileTypes",
+     * @ORM\ManyToMany(targetEntity="Application\Entity\Role",inversedBy="users")
+     * @ORM\JoinTable(name="UserRoles",
      *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="profile_id", referencedColumnName="id")}
+     *      inverseJoinColumns={@ORM\JoinColumn(name="role_id", referencedColumnName="id")}
      *      )
      **/
-    protected $profile_types;
+    protected $roles;
     
     /**
      * @ORM\ManyToMany(targetEntity="Application\Entity\GroupChats", inversedBy="users")
@@ -69,10 +73,10 @@ class Users implements User {
      **/
     protected $group_chats;
     
-    /**
+    /*/**
      * @ORM\OneToMany(targetEntity="SoldSongs", mappedBy="users")
      **/
-    protected $bought;
+    //protected $bought;
     
     /**
      * @ORM\OneToMany(targetEntity="Payments", mappedBy="users")
@@ -92,10 +96,10 @@ class Users implements User {
     /**
      * @ORM\OneToMany(targetEntity="PrivateMessages", mappedBy="sender")
      **/
-    protected $senders;
+    protected $sentMessages;
     
     /**
-     * @ORM\OneToMany(targetEntity="PrivateMessages", mappedBy="recipient")
+     * @ORM\ManyToMany(targetEntity="PrivateMessages", mappedBy="recipient")
      **/
     protected $recipients;
     
@@ -105,20 +109,58 @@ class Users implements User {
      */
     protected $user_profile;
     
+    /**
+     * @ORM\OneToOne(targetEntity="BankAccounts", inversedBy="user")
+     * @ORM\JoinColumn(name="bank_id", referencedColumnName="id")
+     */
+    protected $bank;
+    
+    /**
+     * @ORM\ManyToMany(targetEntity="Application\Entity\Users", inversedBy="followedBy")
+     * @ORM\JoinTable(name="Follow",
+     *      joinColumns={@ORM\JoinColumn(name="follow_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="followed_id", referencedColumnName="id")}
+     *      )
+     **/
+    protected $follows;
+    
+    /**
+     * @ORM\ManyToMany(targetEntity="Users", mappedBy="follows")
+     */
+    protected $followedBy;
+    
+    /**
+     * @ORM\OneToMany(targetEntity="Downloads", mappedBy="user")
+     * @ORM\OrderBy({"created" = "DESC"})
+     **/
+    protected $downloads;
+    
+    /**
+     * @ORM\ManyToMany(targetEntity="Application\Entity\Albums", inversedBy="users")
+     * @ORM\JoinTable(name="AlbumCollaborators",
+     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="album_id", referencedColumnName="id")}
+     *      )
+     * @ORM\OrderBy({"created" = "DESC"})
+     **/
+    protected $albums;
     
     public function __construct(){
     	$this->created = new \DateTime();
     	$this->activated = FALSE;
     	$this->is_admin = FALSE;
-    	$this->profile_types = new \Doctrine\Common\Collections\ArrayCollection();
+    	$this->roles = new \Doctrine\Common\Collections\ArrayCollection();
     	$this->group_chats = new \Doctrine\Common\Collections\ArrayCollection();
     	$this->songs = new \Doctrine\Common\Collections\ArrayCollection();
-    	$this->bought = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->albums = new \Doctrine\Common\Collections\ArrayCollection();
     	$this->payments = new \Doctrine\Common\Collections\ArrayCollection();
     	$this->versions = new \Doctrine\Common\Collections\ArrayCollection();
     	$this->likes = new \Doctrine\Common\Collections\ArrayCollection();
-    	$this->senders = new \Doctrine\Common\Collections\ArrayCollection();
+    	$this->sentMessages = new \Doctrine\Common\Collections\ArrayCollection();
     	$this->recipients = new \Doctrine\Common\Collections\ArrayCollection();
+    	$this->follows = new \Doctrine\Common\Collections\ArrayCollection();
+    	$this->followedBy = new \Doctrine\Common\Collections\ArrayCollection();
+    	$this->downloads = new \Doctrine\Common\Collections\ArrayCollection();
     	
     }
 
@@ -164,12 +206,12 @@ class Users implements User {
     	return $this->created;
     }
     
-    public function getProfile_types(){
-    	return $this->profile_types;
+    public function getRoles(){
+    	return $this->roles;
     }
     
-    public function setProfile_types($profile_types){
-    	$this->profile_types = $profile_types;
+    public function setRoles($roles){
+    	$this->roles = $roles;
     }
     
     public function getGroup_chats(){
@@ -196,12 +238,12 @@ class Users implements User {
     	$this->payments = $payments;
     }
     
-    public function getBought(){
-    	return $this->bought;
+    public function getBank(){
+    	return $this->bank;
     }
     
-    public function setBought($bought){
-    	$this->bought = $bought;
+    public function setBank($bank){
+    	$this->bank = $bank;
     }
     
     public function getLikes(){
@@ -228,12 +270,12 @@ class Users implements User {
     	$this->recipients = $recipients;
     }
     
-    public function getSenders(){
-    	return $this->senders;
+    public function getSentMessages(){
+    	return $this->sentMessages;
     }
     
-    public function setSenders($senders){
-    	$this->senders = $senders;
+    public function setSentMessages($messages){
+    	$this->sentMessages = $messages;
     }
     
     public function getDisplayName(){
@@ -264,6 +306,30 @@ class Users implements User {
     	$this->user_profile = $userprofile;
     }
     
+    public function getFollows(){
+    	return $this->follows;
+    }
+    
+    public function setFollows($follows){
+    	$this->follows = $follows;
+    }
+    
+    public function getFollowedBy(){
+    	return $this->followedBy;
+    }
+    
+    public function setFollowedBy($followedBy){
+    	$this->followedBy = $followedBy;
+    }
+    
+    public function getAlbums(){
+    	return $this->albums;
+    }
+    
+    public function setAlbums($albums){
+    	$this->albums = $albums;
+    }
+    
     /**
      * Convert the object to an array.
      *
@@ -288,7 +354,7 @@ class Users implements User {
     	if(array_key_exists('password_salt', $data))
     	   $this->password_salt = $data['password_salt'];
     	
-    	if(array_key_exists('password_salt', $data))
+    	if(array_key_exists('activated', $data))
     	   $this->activated = $data['activated'];
     	
     	if(array_key_exists('created', $data))
@@ -314,30 +380,30 @@ class Users implements User {
     
     /* Collection */
     
-    public function hasProfileType(ProfileTypes $profileType) {
-    	$profileTypes = array();
-    	foreach ($this->getProfile_types() as $arrMember) {
-    		$profileTypes[] = $arrMember->getProfile_key();
+    public function hasRole(Role $role) {
+    	$roles = array();
+    	foreach ($this->getRoles() as $arrMember) {
+    		$roles[] = $arrMember->getRole_key();
     	}
-    	if (in_array($profileType->getProfile_key(), $profileTypes))    //check if the supplied language is to be removed or not
+    	if (in_array($role->getRole_key(), $roles))    //check if the supplied language is to be removed or not
     		return true;
     	else 
     	    return false;
     }
     
-    public function removeProfileType (ProfileTypes $profileType) {
-    	$this->profile_types->removeElement($profileType);
-    	$profileType->unsetUser($this);
+    public function removeRole (Role $role) {
+    	$this->roles->removeElement($role);
+    	$role->unsetUser($this);
     }
     
-    public function addProfileType (ProfileTypes $profileType) {
-    	$profileType->setUser($this);
-    	$this->profile_types[] = $profileType;
+    public function addRole (Role $role) {
+    	$role->setUser($this);
+    	$this->roles[] = $role;
     }
     /* end Languages methods */
     
-    public function countProfileTypes(){
-    	return $this->profile_types->count();
+    public function countRoles(){
+    	return $this->roles->count();
     }
     
     /* Collection Songs */
@@ -367,6 +433,93 @@ class Users implements User {
     public function countSongs(){
     	return $this->songs->count();
     }
+    
+    
+    
+    
+    
+    
+    public function hasFollower(Users $follower) {
+    	$followers = array();
+    	foreach ($this->getFollowedBy() as $arrMember) {
+    		$followers[] = $arrMember->getId();
+    	}
+    	if (in_array($follower->getId(), $followers))    //check if the supplied language is to be removed or not
+    		return true;
+    	else
+    		return false;
+    }
+    
+    public function removeFollower (Users $follower) {
+    	$this->followedBy->removeElement($follower);
+    	//$follower->unfollow($this);
+    }
+    
+    public function addFollower (Users $follower) {
+    	//$follower->follow($this);
+    	$this->followedBy[] = $follower;
+    }
+    
+    
+    public function isFollowedBy(Users $followedBy) {
+    	$followers = array();
+    	foreach ($this->getFollows() as $arrMember) {
+    		$followers[] = $arrMember->getId();
+    	}
+    	if (in_array($followedBy->getId(), $followers))    //check if the supplied language is to be removed or not
+    		return true;
+    	else
+    		return false;
+    }
+    
+    public function unfollow (Users $user) {
+    	if($user->hasFollower($this)){
+    	    $user->removeFollower($this);
+    	    $this->follows->removeElement($user);
+    	}
+    }
+    
+    public function follow (Users $user) {
+    	$user->addFollower($this);
+        $this->follows[] = $user;
+    }
+    
+    
+    private function setUserRole(){
+       
+        
+    }
+    
+    public function hasAlbum (Albums $album) {
+    	$albums = array();
+    	foreach ($this->getAlbums() as $arrMember) {
+    		$albums[] = $arrMember->getName();
+    	}
+    	if (in_array($album->getName(), $albums))
+    		return true;
+    }
+    
+    public function removeAlbum (Albums $album) {
+    	$this->albums->removeElement($album);
+    	$album->unsetUser($this);
+    }
+    
+    public function addAlbum (Albums $album) {
+    	$album->setUser($this);
+    	$this->albums[] = $album;
+    }
+    
+    
+    public function removeRecipient (PrivateMessages $message) {
+    	$this->recipients->removeElement($message);
+    	//$follower->unfollow($this);
+    }
+    
+    public function addRecipient (PrivateMessages $message) {
+    	//$follower->follow($this);
+    	$this->recipients[] = $message;
+    }
+    
     
     
     

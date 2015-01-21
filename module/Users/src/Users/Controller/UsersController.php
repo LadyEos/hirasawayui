@@ -5,12 +5,11 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Doctrine\ORM\EntityManager;
 use Application\Entity\Users;
-use Application\Entity\UserProfiles;
+use Application\Entity\Role;
 use ZfcUser\Controller\UserController as ZfcUser;
 use Zend\Stdlib\ResponseInterface as Response;
 use Zend\Stdlib\Parameters;
 use ZfcUser\Service\User as UserService;
-use Application\Entity\ProfileTypes;
 use Zend\Http\Request;
 use Zend\Session\Container;
 use Users\Form\RoleForm;
@@ -27,11 +26,11 @@ class UsersController extends ZfcUser
 
     protected $userService;
 
-    protected $profileTypeService;
+    protected $roleService;
 
     protected $appUserService;
     
-    protected $ptEntity = 'Application\Entity\ProfileTypes';
+    protected $roleEntity = 'Application\Entity\Role';
 
     /**
      *
@@ -52,12 +51,12 @@ class UsersController extends ZfcUser
         $this->_view = new ViewModel();
         
         $user = $this->getAppUserService()->findAndSetUser($this->zfcUserAuthentication()->getIdentity()->getId());
-        $profile = $user->getUserProfile();
+        $role = $user->getUserProfile();
         
-        if ($profile != null && $profile->getProfile_picture_url() != null) {
+        if ($role != null && $role->getProfile_picture_url() != null) {
             $dataGravatar = array(
                 'useGravatar' => false,
-                'imgURL' => $profile->getProfile_picture_url()
+                'imgURL' => $role->getProfile_picture_url()
             );
             $this->_view->setVariable('dataGravatar', $dataGravatar);
         }
@@ -110,6 +109,7 @@ class UsersController extends ZfcUser
         $post = $prg;
         $user = $service->register($post);
         
+        
         $redirect = isset($prg['redirect']) ? $prg['redirect'] : null;
         
         if (! $user) {
@@ -119,6 +119,8 @@ class UsersController extends ZfcUser
                 'redirect' => $redirect
             );
         }
+        
+        $this->getRoleService()->setAsUser($user);
         
         if ($service->getOptions()->getLoginAfterRegistration()) {
             $identityFields = $service->getOptions()->getAuthIdentityFields();
@@ -146,19 +148,19 @@ class UsersController extends ZfcUser
         $user = $this->getAppUserService()->findAndSetUser($this->zfcUserAuthentication()->getIdentity()->getId());
         $this->getAppUserService()->setUser($user);
         
-        $query = 'SELECT pt FROM '.$this->ptEntity.' pt WHERE pt.profile_key = :key';
-        $profTypes = $this->getProfileTypeService()->query($query, array('key' => 'PVo'));
+        $query = 'SELECT pt FROM '.$this->roleEntity.' pt WHERE pt.role_key = :key';
+        $roles = $this->getRoleService()->query($query, array('key' => 'PVo'));
 
-        if (! $user->hasProfileType($profTypes[0])) {
+        if (! $user->hasRole($roles[0])) {
 
-            $query = 'SELECT pt FROM '.$this->ptEntity.' pt WHERE pt.profile_key = :key';
-            $basic = $this->getProfileTypeService()->query($query, array('key' => 'B'));
+            $query = 'SELECT pt FROM '.$this->roleEntity.' pt WHERE pt.role_key = :key';
+            $basic = $this->getRoleService()->query($query, array('key' => 'B'));
             
-            foreach ($basic as $profile) {
-                $this->getAppUserService()->removeProfileType($profile);
+            foreach ($basic as $role) {
+                $this->getAppUserService()->removeRole($role);
             }
             
-            $this->getAppUserService()->addProfileType($profTypes[0]);
+            $this->getAppUserService()->addRole($roles[0]);
         }
         
         if ($user->getUserProfile() == null) {
@@ -177,19 +179,19 @@ class UsersController extends ZfcUser
         $user = $this->getAppUserService()->findAndSetUser($this->zfcUserAuthentication()->getIdentity()->getId());
         $this->getAppUserService()->setUser($user);
 
-        $query = 'SELECT pt FROM '.$this->ptEntity.' pt WHERE pt.profile_key = :key';
-        $profTypes = $this->getProfileTypeService()->query($query, array('key' => 'PLy'));
+        $query = 'SELECT pt FROM '.$this->roleEntity.' pt WHERE pt.role_key = :key';
+        $roles = $this->getRoleService()->query($query, array('key' => 'PLy'));
         
-        if (! $user->hasProfileType($profTypes[0])) {
+        if (! $user->hasRole($roles[0])) {
 
-            $query = 'SELECT pt FROM '.$this->ptEntity.' pt WHERE pt.profile_key = :key';
-            $basic = $this->getProfileTypeService()->query($query, array('key' => 'B'));
+            $query = 'SELECT pt FROM '.$this->roleEntity.' pt WHERE pt.role_key = :key';
+            $basic = $this->getRoleService()->query($query, array('key' => 'B'));
             
-            foreach ($basic as $profile) {
-                $this->getAppUserService()->removeProfileType($profile);
+            foreach ($basic as $role) {
+                $this->getAppUserService()->removeRole($role);
             }
             
-            $this->getAppUserService()->addProfileType($profTypes[0]);
+            $this->getAppUserService()->addRole($roles[0]);
         }
         
         if ($user->getUserProfile() == null) {
@@ -209,19 +211,19 @@ class UsersController extends ZfcUser
         $user = $this->getAppUserService()->findAndSetUser($this->zfcUserAuthentication()->getIdentity()->getId());
         $this->getAppUserService()->setUser($user);
         
-        $query = 'SELECT pt FROM '.$this->ptEntity.' pt WHERE pt.profile_key = :key';
-        $profTypes = $this->getProfileTypeService()->query($query, array('key' => 'PCo'));
+        $query = 'SELECT pt FROM '.$this->roleEntity.' pt WHERE pt.role_key = :key';
+        $roles = $this->getRoleService()->query($query, array('key' => 'PCo'));
         
-        if (! $user->hasProfileType($profTypes[0])) {
+        if (! $user->hasRole($roles[0])) {
 
-            $query = 'SELECT pt FROM '.$this->ptEntity.' pt WHERE pt.profile_key = :key';
-            $basic = $this->getProfileTypeService()->query($query, array('key' => 'B'));
+            $query = 'SELECT pt FROM '.$this->roleEntity.' pt WHERE pt.role_key = :key';
+            $basic = $this->getRoleService()->query($query, array('key' => 'B'));
             
-            foreach ($basic as $profile) {
-                $this->getAppUserService()->removeProfileType($profile);
+            foreach ($basic as $role) {
+                $this->getAppUserService()->removeRole($role);
             }
             
-            $this->getAppUserService()->addProfileType($profTypes[0]);
+            $this->getAppUserService()->addRole($roles[0]);
         }
         
         if ($user->getUserProfile() == null) {
@@ -240,26 +242,28 @@ class UsersController extends ZfcUser
         $user = $this->getAppUserService()->findAndSetUser($this->zfcUserAuthentication()->getIdentity()->getId());
         $this->getAppUserService()->setUser($user);
         
-        $query = 'SELECT pt FROM '.$this->ptEntity.' pt WHERE pt.profile_key = :key';
-        $profType = $this->getProfileTypeService()->query($query, array('key' => 'B'));
+        $query = 'SELECT pt FROM '.$this->roleEntity.' pt WHERE pt.role_key = :key';
+        $hasRole = $this->getRoleService()->query($query, array('key' => 'B'));
         
-        if (! $user->hasProfileType($profTypes[0])) {
-            $basic = $profTypes[0];
+        if (! $user->hasRole($hasRole[0])) {
+            $basic = $hasRole[0];
             
-            $query = 'SELECT pt FROM '.$this->ptEntity.' pt WHERE pt.profile_key = :key';
-            $profTypes = $this->getProfileTypeService()->query($query, array('key' => 'B'));
+            //$query = 'SELECT pt FROM '.$this->roleEntity.' pt WHERE pt.role_key = :key';
+            //$roles = $this->getRoleService()->query($query, array('key' => 'B'));
+            $roles = $this->getAppUserService()->getRoles($user);
             
-            foreach ($profTypes as $profile) {
-                $this->getAppUserService()->removeProfileType($profile);
+            $config = $this->getServiceLocator()->get('config');
+            
+            foreach ($roles as $role) {
+                if($role->getId() != $config['MusicLackey']['userRoleId'] && $role->getId()!= $config['MusicLackey']['adminRoleId'])
+                    $this->getAppUserService()->removeRole($role);
             }
             
-            $this->getAppUserService()->addProfileType($basic);
+            $this->getAppUserService()->addRole($basic);
         }
         
         if ($user->getUserProfile() == null) {
-            return $this->redirect()->toRoute('profile', array(
-                'action' => 'add'
-            ));
+            return $this->redirect()->toRoute('profile', array('action' => 'add'));
         }
         
         $session = new Container('Users');
@@ -267,13 +271,10 @@ class UsersController extends ZfcUser
         if ($url == "profile/edit") {
             // $this->getServiceLocator()->get('Zend\Log')->info($urlFull[0],$urlFull[1]);
             // return $this->redirect()->toRoute($urlFull[0],$urlFull[1]);
-            return $this->redirect()->toRoute('profile', array(
-                'action' => 'edit'
-            ));
+            return $this->redirect()->toRoute('profile', array('action' => 'edit'));
         }
-        return $this->redirect()->toRoute('profile', array(
-            'action' => 'edit'
-        ));
+        
+        return $this->redirect()->toRoute('profile', array('action' => 'edit'));
         // return $this->redirect()->toRoute($this->replaceUrl($url));
         
         // return $this->redirect()->toRoute('zfcuser/home');
@@ -310,9 +311,9 @@ class UsersController extends ZfcUser
         
         $user = $this->getAppUserService()->findAndSetUser($this->zfcUserAuthentication()->getIdentity()->getId());
         $this->getAppUserService()->setUser($user);
-        $roles = $user->getProfile_types()->toArray();
+        $roles = $this->getAppUserService()->getRoles($user);
         
-        $form = new RoleForm('role', $this->buildRoleSelectbox($roles));
+        $form = new RoleForm('role', $this->getRoleService()->buildRoleSelectbox($roles));
         $form->setAttribute('method', 'post');
         
         $request = $this->getRequest();
@@ -323,14 +324,14 @@ class UsersController extends ZfcUser
                 
                 $data = array_merge_recursive($this->getRequest()->getPost()->toArray());
                 
-                $key = $data['profile_types'];
+                $key = $data['roles'];
                 
-                $query = 'SELECT pt FROM Application\Entity\ProfileTypes pt WHERE pt.profile_key = :key';
-                $profType = $this->getProfileTypeService()->query($query, array(
+                $query = 'SELECT pt FROM '.$this->roleEntity.' pt WHERE pt.role_key = :key';
+                $profType = $this->getRoleService()->query($query, array(
                     'key' => $key
                 ));
                 
-                $this->getAppUserService()->removeProfileType($profType[0]);
+                $this->getAppUserService()->removeRole($profType[0]);
                 
                 return $this->redirect()->toRoute('profile', array(
                     'action' => 'edit'
@@ -339,12 +340,12 @@ class UsersController extends ZfcUser
         }
         
         return array(
-            'id' => $id,
+            'id' => $user->getId(),
             'form' => $form,
-            'profileTypes' => $user->getProfile_types()->toArray()
+            'roles' => $user->getRoles()->toArray()
         );
     }
-
+   
     public function testAction()
     {
         return new ViewModel();
@@ -352,9 +353,7 @@ class UsersController extends ZfcUser
 
     private function replaceUrl($string)
     {
-        $this->getServiceLocator()
-            ->get('Zend\Log')
-            ->info($string);
+        $this->getServiceLocator()->get('Zend\Log')->info($string);
         if (strpos($string, 'zfcuser') !== FALSE) {
             $change = '/user';
             $url = 'zfcuser';
@@ -374,16 +373,6 @@ class UsersController extends ZfcUser
             return $string;
     }
 
-    private function buildRoleSelectbox($roles)
-    {
-        $select = array();
-        foreach ($roles as $role) {
-            $select[$role->getProfile_key()] = $role->getProfile_name();
-        }
-        
-        return $select;
-    }
-
     private function getAppUserService()
     {
         if (! $this->appUserService) {
@@ -393,12 +382,12 @@ class UsersController extends ZfcUser
         return $this->appUserService;
     }
 
-    private function getProfileTypeService()
+    private function getRoleService()
     {
-        if (! $this->profileTypeService) {
-            $this->profileTypeService = $this->getServiceLocator()->get('Application\Service\ProfileTypeService');
+        if (! $this->roleService) {
+            $this->roleService = $this->getServiceLocator()->get('Application\Service\RoleService');
         }
         
-        return $this->profileTypeService;
+        return $this->roleService;
     }
 }

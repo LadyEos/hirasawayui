@@ -9,6 +9,8 @@ use Application\Entity\UserProfiles;
 use ZfcUser\Service\User as UserService;
 use Users\Form\ProfileFilter;
 use Users\Form\ProfileForm;
+use Users\Form\BankForm;
+use Users\Form\BankFilter;
 
 use Zend\Http\Request;
 use Zend\Session\Container;
@@ -30,30 +32,38 @@ class ProfileController extends AbstractActionController
         
         $this->_view = new ViewModel();
         
-        $id = $this->zfcUserAuthentication()->getIdentity()->getId();
-        $user = $this->getUserService()->findAndSetUser($id);
+        $logId = $this->zfcUserAuthentication()->getIdentity()->getId();
+        $logUser = $this->getUserService()->find($logId);
+        
+        $id = $this->params()->fromRoute('id');
+        $username = $this->params()->fromRoute('username');
         
         if($id != null){
             $user = $this->getUserService()->find($id);
-        }
-        else if($username != null){
-            //$this->getServiceLocator()->get('Zend\Log')->info($username);
-            $user = $this->getUserService()->findOneBy(array('username' => $username));
-        }else{   
-            $user = $this->getUserService()->find($this->zfcUserAuthentication()->getIdentity()->getId());
-        }
+        }else{
+            if($username != null){
+            	//$this->getServiceLocator()->get('Zend\Log')->info($username);
+            	$user = $this->getUserService()->findOneBy(array('username' => $username));
+            }else{
+            	$user = $logUser;
+            }
+        } 
         $profile = $user->getUserProfile();
         $this->getUserService()->setUser($user);
         
         $sampleSongs =  $this->getUserService()->getSampleSongs();
         $projects= $this->getUserService()->getProjects();
         $finishedProjects= $this->getUserService()->getFinishedProjects();
+        $mutuals = $this->getUserService()->getMutuals($user);
+        
+        //$this->_view->(APPLICATION_PATH.'/modules/Users/view/users/fellowship/feed');
        
         $this->_view->setVariable('user', $user);
         $this->_view->setVariable('profile', $profile);
         $this->_view->setVariable('samples',$sampleSongs);
         $this->_view->setVariable('projects', $projects);
         $this->_view->setVariable('finishedProjects', $finishedProjects);
+        $this->_view->setVariable('mutuals', $mutuals);
             
         return $this->_view;
     }
@@ -86,7 +96,7 @@ class ProfileController extends AbstractActionController
     			//$this->getServiceLocator()->get('Zend\Log')->info($form->getData());
     			
     			$country = $this->getCountryService()->find($data['country']);
-    			$this->getProfileService()->createProfile($data,$country,$user);
+    			$this->getProfileService()->createProfile($data,$country,$user,$data['genres']);
     
     			return $this->redirect()->toRoute('avatar',array('action'=>'upload'));
     		}
@@ -127,10 +137,12 @@ class ProfileController extends AbstractActionController
     
     			$data = array_merge_recursive(
     					$this->getRequest()->getPost()->toArray());
+    			
+    			//$this->getServiceLocator()->get('Zend\Log')->info($data['genres']);
 
     			$country = $this->getCountryService()->find($data['country']);
     			
-    			$this->getProfileService()->editProfile($country,$user,$form->getData()->getDisplayName());
+    			$this->getProfileService()->editProfile($country,$user,$form->getData()->getDisplayName(),$data['genres']);
     			return $this->redirect()->toRoute('zfcuser/home');
     		}
     	}
@@ -138,10 +150,49 @@ class ProfileController extends AbstractActionController
     	return array(
     			'id' => $id,
     			'form' => $form,
-    			'profileTypes' => $user->getProfile_types()->toArray()
+    			'roles' => $user->getRoles()->toArray()
     	);
     }
     
+    /* public function followAction()
+    {
+    	if (! $this->zfcUserAuthentication()->hasIdentity()) {
+    		return $this->redirect()->toRoute(static::ROUTE_LOGIN);
+    	}
+    
+    	$logId = $this->zfcUserAuthentication()->getIdentity()->getId();
+    	$user = $this->getUserService()->find($logId);
+    
+    	$id = $this->params()->fromRoute('id');
+    
+    	$this->getAppUserService()->setUser($user);
+    	$this->getAppUserService()->follow( $this->getAppUserService()->find($id));
+    
+    	return $this->redirect()->toRoute('profile', array(
+    			'action' => 'view',
+    			'id'=>$logId
+    	));
+    }
+    
+    public function unfollowAction(){
+    	if (! $this->zfcUserAuthentication()->hasIdentity()) {
+    		return $this->redirect()->toRoute(static::ROUTE_LOGIN);
+    	}
+    
+    	$user = $this->getUserService()->findAndSetUser($this->zfcUserAuthentication()->getIdentity()->getId());
+    
+    	$id = $this->params()->fromRoute('id');
+    
+    	$this->getAppUserService()->setUser($user);
+    	$this->getAppUserService()->unfollow( $this->getAppUserService()->find($id));
+    
+    	return $this->redirect()->toRoute('profile', array(
+    			'action' => 'view',
+    			'id'=>$id
+    	));
+    } */
+    
+
     
     private function getUserService()
     {

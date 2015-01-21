@@ -1,0 +1,57 @@
+<?php
+$title = 'CONFIRM';
+$this->headTitle($title);
+$totalamt = 0;
+?>
+<h1><?php echo $this->escapeHtml($title); ?></h1>
+
+<div class="row">
+    <div id="fields" class="col-md-5">
+        <p>Total Items: <?php echo sizeof($this->cart)?></p>
+		
+            <?php if(sizeof($this->cart) > 0):?>		
+            <ul>
+                <?php foreach ($this->cart as $item ):?>
+                    <li><?php echo $item['name'].' - $'.$item['amt']?> </li>
+                    <?php $totalamt += $item['amt']; ?>
+                <?php endforeach;?>
+            </ul>
+            <?php else:?>   
+            <p>There are no items to download</p>
+            <?php endif;?>
+        
+		<p>Total Sum: $<?php echo $totalamt?></p>
+    </div>
+    <div>
+        <?php $form->prepare();
+            echo $this->form()->openTag($form); ?>
+        
+        <?php foreach ($form as $element) : ?>
+        
+            <div style="width: 330px;" class="form-group <?php if ($this->formElementErrors($element)) echo "has-error" ?>">
+            
+            <?php if ('file' == $element->getAttribute('type') || 'checkbox' == $element->getAttribute('type')){?>
+                <label class="control-label"><?php echo $element->getLabel(); ?></label>
+            <?php } else if ('submit' != $element->getAttribute('type')) { ?>
+                <label class="control-label"><?php echo $element->getLabel() ?></label>
+            <?php $element->setAttribute('class', 'form-control')->setAttribute('placeholder', $element->getLabel());
+                } else {
+                    $element->setAttribute('class', 'btn btn-success');
+                }
+                
+                if ('checkbox' != $element->getAttribute('type') || 'radio' != $element->getAttribute('type'))
+                    echo $this->formElement($element);
+
+                if ($this->formElementErrors($element)) : ?>
+                    <?php echo $this->formElementErrors()
+                        ->setMessageOpenFormat('<p class="help-block">')
+                        ->setMessageSeparatorString('</p><p class="help-block">')
+                        ->setMessageCloseString('</p>')
+                        ->render($element);
+                    ?>
+                <?php endif; ?>
+            </div>
+        <?php endforeach;
+        echo $this->form()->closeTag();?>
+    </div>
+</div>

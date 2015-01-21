@@ -1,0 +1,55 @@
+<?php // 'checkout.phtml' in '/application/views/scripts/billing'
+
+/*
+//require_once ("paypalfunctions.php");
+$adapter = $this->adapter;
+//echo $adapter;
+$paymentAmount = '10.00';
+$currencyCodeType = 'USD';
+$paymentType = 'Sale';
+$returnURL = 'http://' . $_SERVER['HTTP_HOST'] . '/store/confirm';
+$cancelURL = 'http://' . $_SERVER['HTTP_HOST'] . '/store/cancel';
+
+$items = array();
+$items[] = array(
+   'name'   => 'Item Name',
+   'amt'   => $paymentAmount,
+   'qty'   => 1
+);
+
+// Obtain a token.
+$reply = $adapter->ecSetExpressCheckout($paymentAmount, $returnURL, $cancelURL, $currencyCodeType, $items, $paymentType);
+echo 'pase por aqui';
+// If we succeed, we must redirect to PayPal at this point.
+if ($reply->isSuccess()) {
+    echo 'entre';
+    //$json = json_decode($reply->getContent());
+    
+    var_dump($adapter->parse($reply->getBody()));
+   
+   // Let's turn that message body into something we can use...
+   $replyData   = $adapter->parse($reply->getBody());
+   $ack      = strtoupper($replyData->ACK);
+   echo ' yei '.$ack;
+   // If we did in fact succeed, we will now have a token to use
+   if ($ack == 'SUCCESS' || $ack == 'SUCCESSWITHWARNING') {
+       echo ' meep ';
+      // Save the amount total... We must use this when we capture the funds.
+      $_SESSION['CHECKOUT_AMOUNT'] = $paymentAmount;
+      
+      echo ' session saved';
+      echo $adapter->PAYPAL_DG_URL;
+      
+      //$this->_redirect($adapter->PAYPAL_DG_URL . urldecode($replyData->TOKEN));
+      // Redirect to the PayPal express checkout page, using the token.
+      
+      //header('Location: ' . $adapter->PAYPAL_DG_URL . urldecode($replyData->TOKEN));
+   }
+   
+}
+else{
+   echo 'omg error!';
+    throw new Exception('ECSetExpressCheckout: We failed to get a successful response from PayPal.');
+
+}*/
+?>
