@@ -50,6 +50,7 @@ class AlbumController extends AbstractActionController
         $this->_view = new ViewModel();
         $album = $this->getAlbumService()->find($this->params()->fromRoute('id'));
         $user = $this->getUserService()->findAndSetUser($this->zfcUserAuthentication()->getIdentity()->getId());
+        $authorize = $this->getServiceLocator()->get('BjyAuthorize\Provider\Identity\ProviderInterface');
         $roles = $authorize->getIdentityRoles();
         
         if($album->getUsers()->contains($user)){

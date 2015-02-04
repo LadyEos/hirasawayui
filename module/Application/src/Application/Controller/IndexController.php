@@ -38,6 +38,7 @@ class IndexController extends AbstractActionController
         	
             $em->getClassMetadata('Application\Entity\Actions'),
             $em->getClassMetadata('Application\Entity\Albums'),
+            $em->getClassMetadata('Application\Entity\BankAccounts'),
             $em->getClassMetadata('Application\Entity\Countries'),
             $em->getClassMetadata('Application\Entity\Downloads'),
             $em->getClassMetadata('Application\Entity\Genres'),

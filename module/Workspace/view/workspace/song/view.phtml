@@ -16,6 +16,27 @@ $this->headTitle($title);
 <h1><?php echo $this->escapeHtml($title); ?></h1>
 
 
+<div>
+<div style="float:left; padding-right:16px;">
+    <?php 
+        echo '<img src="'.$this->song->getCoverurl().'" height="100px" width="100px"></img>';
+    ?>
+    </div>
+<div id="infoWrapper">
+    <?php
+    echo '<br>';
+    echo '<p>Description<br>' . $this->song->getDescription() . '</p>';
+    echo '<p>Notes<br>' . $this->song->getNotes() . '</p>';
+    echo '<hr>';
+    echo '<p>Version Comments<br></p>';
+    echo '<p>'.$this->song->getVersions()->first()->getComments().'</p>';
+    if (!isset($this->author)){
+        echo '<p><a href="'.$this->url('fellowship',array('action'=>'like','id'=>$this->song->getId())).'">Like</a> this project!</p>';
+    }
+    ?>
+</div>
+</div>
+
 <div id="audioWrapper">
 <?php echo '<input type="hidden" id="filePath" value="' . '/uploads' . $version->getUrl() . '"/>';?>
 <?php echo '<input type="hidden" id="songTitle" value="' . $this->song->getName() . '"/>';?>
@@ -77,19 +98,9 @@ $this->headTitle($title);
     <hr>
     <?php endif; ?>
 </div>
-<div id="infoWrapper">
-    <?php
-    echo '<br>';
-    echo '<p>Description<br>' . $this->song->getDescription() . '</p>';
-    echo '<p>Notes<br>' . $this->song->getNotes() . '</p>';
-    echo '<hr>';
-    echo '<p>Version Comments<br></p>';
-    echo '<p>'.$this->song->getVersions()->first()->getComments().'</p>';
-    if (!isset($this->author)){
-        echo '<p><a href="'.$this->url('fellowship',array('action'=>'like','id'=>$this->song->getId())).'">Like</a> this project!</p>';
-    }
-    ?>
-</div>
+
+
+
 <div id="authorWrapper">
     <?php
     if (isset($this->author)){
@@ -111,6 +122,7 @@ $this->headTitle($title);
         <?php if($this->song->getVersions()->count() > 1){?>
         <a href="<?php echo $this->url('version',array('action'=>'past','id'=>$this->song->getId())) ?>">
         <?php echo $this->translate('View previous versions') ?></a>
+        <a href="<?php echo $this->url('avatar',array('action'=>'songcover','id'=>$this->song->getId()))?>">Add/Change Song Cover</a>
         
     <?php   }
         }?>

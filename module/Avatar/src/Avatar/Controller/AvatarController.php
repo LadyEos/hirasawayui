@@ -18,6 +18,8 @@ class AvatarController extends AbstractActionController
     protected $uriPaths = array();
     protected $userService;
     protected $profileService;
+    protected $albumService;
+    protected $songService;
     
     public function indexAction()
     {
@@ -110,6 +112,119 @@ class AvatarController extends AbstractActionController
             'form' => $form,
         );
     }
+    
+    
+    public function albumcoverAction(){
+        if (! $this->zfcUserAuthentication()->hasIdentity()) {
+        	return $this->redirect()->toRoute(static::ROUTE_LOGIN);
+        }
+        
+        $url = '/images/tmpuploads/albumcover/';
+        
+        $user = $this->getUserService()->findAndSetUser($this->zfcUserAuthentication()->getIdentity()->getId());
+        
+        $id = $this->params()->fromRoute('id');
+        $album = $this->getAlbumService()->find($id);
+        
+        
+        $form = new UploadForm('upload-form');
+        
+        if ($this->getRequest()->isPost()) {
+        	// Postback
+        	$form->setInputFilter(new UploadFilter($this->getServiceLocator()));
+        	$data = array_merge_recursive(
+        			$this->getRequest()->getPost()->toArray(),
+        			$this->getRequest()->getFiles()->toArray());
+        	$form->setData($data);
+        
+        	if ($form->isValid()) {
+        		$data = $form->getData();
+        
+        		$extension = pathinfo($data['file']['name'], PATHINFO_EXTENSION);
+
+        		$string = './public'.$url.'/';
+        		$filter = new \Zend\Filter\File\Rename(array(
+        				'target' => $string.'acover.'.$extension,
+        				'randomize' => true,
+        				'overwrite' => false
+        		));
+        
+        		$upload = $filter->filter($data['file']);
+
+        		if ($upload['error'] == 0) {
+        			$lenght = strlen($string);
+        			$name = substr($upload['tmp_name'], $lenght-1);
+        
+        			$this->getAlbumService()->setAlbumCover($album, $url.$name);
+        		} else {
+        			$errors = $upload['error'];
+        		}
+        
+        		return $this->redirect()->toRoute('album', array(
+    			'action' => 'index'));
+        	}
+        }
+        
+        return array(
+        		'form' => $form,
+        );
+    }
+    
+    public function songcoverAction(){
+    	if (! $this->zfcUserAuthentication()->hasIdentity()) {
+    		return $this->redirect()->toRoute(static::ROUTE_LOGIN);
+    	}
+    
+    	$url = '/images/tmpuploads/songcover/';
+    
+    	$user = $this->getUserService()->findAndSetUser($this->zfcUserAuthentication()->getIdentity()->getId());
+    
+    	$id = $this->params()->fromRoute('id');
+    	$song = $this->getSongService()->find($id);
+    
+    
+    	$form = new UploadForm('upload-form');
+    
+    	if ($this->getRequest()->isPost()) {
+    		// Postback
+    		$form->setInputFilter(new UploadFilter($this->getServiceLocator()));
+    		$data = array_merge_recursive(
+    				$this->getRequest()->getPost()->toArray(),
+    				$this->getRequest()->getFiles()->toArray());
+    		$form->setData($data);
+    
+    		if ($form->isValid()) {
+    			$data = $form->getData();
+    
+    			$extension = pathinfo($data['file']['name'], PATHINFO_EXTENSION);
+    
+    			$string = './public'.$url.'/';
+    			$filter = new \Zend\Filter\File\Rename(array(
+    					'target' => $string.'scover.'.$extension,
+    					'randomize' => true,
+    					'overwrite' => false
+    			));
+    
+    			$upload = $filter->filter($data['file']);
+    
+    			if ($upload['error'] == 0) {
+    				$lenght = strlen($string);
+    				$name = substr($upload['tmp_name'], $lenght-1);
+    
+    				$this->getSongService()->setSongCover($song, $url.$name);
+    			} else {
+    				$errors = $upload['error'];
+    			}
+    
+    			return $this->redirect()->toRoute('workspace', array(
+    					'action' => 'workspace'));
+    		}
+    	}
+    
+    	return array(
+    			'form' => $form,
+    	);
+    }
  
     private function getUserService()
     {
@@ -127,5 +242,23 @@ class AvatarController extends AbstractActionController
     	}
     
     	return $this->profileService;
+    }
+    
+    private function getAlbumService()
+    {
+    	if (!$this->albumService) {
+    		$this->albumService = $this->getServiceLocator()->get('Application\Service\AlbumService');
+    	}
+    
+    	return $this->albumService;
+    }
+    
+    private function getSongService()
+    {
+    	if (!$this->songService) {
+    		$this->songService = $this->getServiceLocator()->get('Application\Service\SongService');
+    	}
+    
+    	return $this->songService;
     }
 }

@@ -34,6 +34,11 @@ class Songs {
 	/** @ORM\Column(type="datetime") */
 	protected $created;
 	
+	/**
+	 * @ORM\Column(type="string", length=300, nullable=TRUE)
+	 */
+	protected $cover_url;
+	
 	/*/**
 	 * @ORM\ManyToOne(targetEntity="SoldSongs", mappedBy="songs")
 	 **/
@@ -232,6 +237,13 @@ class Songs {
 		$this->price = $price;
 	}
 	
+	public function getCoverurl(){
+		return $this->cover_url;
+	}
+	
+	public function setCoverurl($cover){
+		$this->cover_url = $cover;
+	}
 	/**
 	 * Convert the object to an array.
 	 *

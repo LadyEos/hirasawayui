@@ -67,8 +67,13 @@ $current = $playlist->first();
 
 
 <h1><?php echo $this->escapeHtml($title); ?></h1>
-<div>
 
+<div>
+    <div style="float:left; padding-right:16px;">
+    <?php 
+        echo '<img src="'.$this->album->getCoverurl().'" height="100px" width="100px"></img>';
+    ?>
+    </div>
 	<div id="infoWrapper">
         <?php
         echo '<p>Description<br>' . $this->album->getDescription() . '</p>';
@@ -81,7 +86,11 @@ $current = $playlist->first();
         }
         ?>
     </div>
-
+</div>
+<br>
+<br>
+<br>
+<div>
     <?php echo '<input type="hidden" id="filePath" value="' . '/uploads' . $version->getUrl() . '"/>';?>
     <?php echo '<input type="hidden" id="songTitle" value="' . $current->getName() . '"/>';?>
 

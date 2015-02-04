@@ -8,26 +8,62 @@ $this->headTitle($title);
 echo '<h3>Samples</h3>';
 
 foreach($this->samples as $song){
-	echo '<a href="'.$this->url('song',array('action'=>'view','id'=>$song->getId())).'">'.$song->getName().
-	'</a> - '.$song->getSampleType().' - '.$song->getVersions()->first()->getCreated()->format('Y-m-d').'<br>';
+    if ($song->getActive() == 1) {
+    	if(sizeof($song->getVersions())>0){
+            echo '<a href="'.$this->url('song',array('action'=>'view','id'=>$song->getId())).'">'.$song->getName().
+        	'</a> - '.$song->getSampleType().' - '.$song->getVersions()->first()->getCreated()->format('Y-m-d').
+        	' - <a href="'.$this->url('song',array('action'=>'edit','id'=>$song->getId())).'">Edit</a>'.
+        	' - <a href="'.$this->url('version',array('action'=>'add','id'=>$song->getId())).'">Add Version</a>'.
+        	'- <a href="'.$this->url('song',array('action'=>'complete','id'=>$song->getId())).'">Finish</a>'.
+        	' - <a href="'.$this->url('song',array('action'=>'delete','id'=>$song->getId())).'">Delete</a>'.
+        	' - <a href="'.$this->url('avatar',array('action'=>'songcover','id'=>$song->getId())).'">Add/Change Song Cover</a>'.
+        	'<br>';
+        }else{
+        	echo '<span style="color:red;font-weight:bold"><a href="'.$this->url('song',array('action'=>'view','id'=>$song->getId())).'">'.$song->getName().
+            '</a> - '.$song->getSampleType().' - NO AUDIO FILE'.
+            ' - <a href="'.$this->url('song',array('action'=>'edit','id'=>$song->getId())).'">Edit</a>'.
+            ' - <a href="'.$this->url('version',array('action'=>'add','id'=>$song->getId())).'">Add Version</a>'.
+            '- <a href="'.$this->url('song',array('action'=>'complete','id'=>$song->getId())).'">Finish</a>'.
+            ' - <a href="'.$this->url('song',array('action'=>'delete','id'=>$song->getId())).'">Delete</a>'.
+            ' - <a href="'.$this->url('avatar',array('action'=>'songcover','id'=>$song->getId())).'">Add/Change Song Cover</a>'.
+            '</span><br>';
+        }
+	}
 }
 echo '<hr>';
 echo '<h3>Projects in progress</h3>';
 foreach($this->projects as $song){
-    if(sizeof($song->getVersions())>0){
-        echo '<a href="'.$this->url('song',array('action'=>'view','id'=>$song->getId())).'">'.$song->getName().
-    	'</a> - '.$song->getVersions()->first()->getCreated()->format('Y-m-d').'<br>';
-    }else{
-        echo '<a href="'.$this->url('song',array('action'=>'view','id'=>$song->getId())).'">'.$song->getName().
-        '</a> - '.' NO AUDIO FILE'//$song->getVersions()->first()->getCreated()->format('Y-m-d')
-        .'<br>';
+    if ($song->getActive() == 1) {
+        if(sizeof($song->getVersions())>0){
+        	echo '<a href="'.$this->url('song',array('action'=>'view','id'=>$song->getId())).'">'.$song->getName().
+        	'</a>'.' - '.$song->getVersions()->first()->getCreated()->format('Y-m-d').
+        	' - <a href="'.$this->url('song',array('action'=>'edit','id'=>$song->getId())).'">Edit</a>'.
+        	' - <a href="'.$this->url('version',array('action'=>'add','id'=>$song->getId())).'">Add Version</a>'.
+        	'- <a href="'.$this->url('song',array('action'=>'complete','id'=>$song->getId())).'">Finish</a>'.
+        	' - <a href="'.$this->url('song',array('action'=>'delete','id'=>$song->getId())).'">Delete</a>'.
+        	' - <a href="'.$this->url('avatar',array('action'=>'songcover','id'=>$song->getId())).'">Add/Change Song Cover</a>'.
+        	'<br>';
+	    }else{
+        	echo '<span style="color:red;font-weight:bold"><a href="'.$this->url('song',array('action'=>'view','id'=>$song->getId())).'">'.$song->getName().
+        	'</a>'.' - NO AUDIO FILE'.//$song->getVersions()->first()->getCreated()->format('Y-m-d').
+        	' - <a href="'.$this->url('song',array('action'=>'edit','id'=>$song->getId())).'">Edit</a>'.
+        	' - <a href="'.$this->url('version',array('action'=>'add','id'=>$song->getId())).'">Add Version</a>'.
+        	' - <a href="'.$this->url('song',array('action'=>'delete','id'=>$song->getId())).'">Delete</a>'.
+        	' - <a href="'.$this->url('avatar',array('action'=>'songcover','id'=>$song->getId())).'">Add/Change Song Cover</a>'.
+            '</span><br>';
+        }
     }
 }
 echo '<hr>';
 echo '<h3>Finished Projects</h3>';
 foreach($this->finishedProjects as $song){
-	echo '<a href="'.$this->url('song',array('action'=>'view','id'=>$song->getId())).'">'.$song->getName().
-	'</a> - '.$song->getVersions()->first()->getCreated()->format('Y-m-d').'<br>';
+    if ($song->getActive() == 1) {
+    	echo '<a href="'.$this->url('song',array('action'=>'view','id'=>$song->getId())).'">'.$song->getName().
+    	'</a> '.$song->getVersions()->first()->getCreated()->format('Y-m-d').' - '
+    	.'<a href="'.$this->url('song',array('action'=>'view','id'=>$song->getId())).'">View</a>'.
+    	' - <a href="'.$this->url('song',array('action'=>'delete','id'=>$song->getId())).'">Delete</a>'.
+    	'<br>';
+	}
 }
 ?>
 

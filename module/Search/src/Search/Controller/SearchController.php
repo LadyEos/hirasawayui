@@ -17,6 +17,7 @@ class SearchController extends AbstractActionController
     protected $searchService;
     protected $userService;
     protected $genreService;
+    protected $albumService;
 
     public function indexAction()
     {
@@ -184,11 +185,14 @@ class SearchController extends AbstractActionController
     
     			if ($form->isValid()) {
     				$data = $form->getData();
-    
-    				$results = $this->getSearchService()->searchAlbum(array('name'=>'%'.$data['keyword'].'%',
-    							'description'=>'%'.$data['keyword'].'%'));
     				
-    
+    				if($data['keyword'] == '' || $data['keyword'] == null ){
+    					$results = $this->getAlbumService()->findAll();
+    				}else{
+    				    $results = $this->getSearchService()->searchAlbum(array('name'=>'%'.$data['keyword'].'%',
+    				    		'description'=>'%'.$data['keyword'].'%'));
+    				}
+    				
     				//return $this->redirect()->toRoute('song',array('action'=>'upload'));
     				$paginator = new Paginator(new ArrayAdapter($results));
     				$paginator->setCurrentPageNumber($this->params()->fromRoute('page'));//$this->params()->fromRoute('page')
@@ -232,6 +236,15 @@ class SearchController extends AbstractActionController
     	}
     
     	return $this->genreService;
+    }
+    
+    private function getAlbumService()
+    {
+    	if (!$this->albumService) {
+    		$this->albumService = $this->getServiceLocator()->get('Application\Service\AlbumService');
+    	}
+    
+    	return $this->albumService;
     }
     
     private function checkId($roles,$id){

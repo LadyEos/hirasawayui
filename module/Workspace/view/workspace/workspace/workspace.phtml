@@ -115,6 +115,7 @@ $this->headTitle($title);
                                 	' - <a href="'.$this->url('version',array('action'=>'add','id'=>$song->getId())).'">Add Version</a>'.
                                 	'- <a href="'.$this->url('song',array('action'=>'complete','id'=>$song->getId())).'">Finish</a>'.
                                 	' - <a href="'.$this->url('song',array('action'=>'delete','id'=>$song->getId())).'">Delete</a>'.
+                                	' - <a href="'.$this->url('avatar',array('action'=>'songcover','id'=>$song->getId())).'">Add/Change Song Cover</a>'.
                                 	'<br>';
                                 }else{
                                 	echo '<span style="color:red;font-weight:bold"><a href="'.$this->url('song',array('action'=>'view','id'=>$song->getId())).'">'.$song->getName().
@@ -123,6 +124,7 @@ $this->headTitle($title);
                                     ' - <a href="'.$this->url('version',array('action'=>'add','id'=>$song->getId())).'">Add Version</a>'.
                                     '- <a href="'.$this->url('song',array('action'=>'complete','id'=>$song->getId())).'">Finish</a>'.
                                     ' - <a href="'.$this->url('song',array('action'=>'delete','id'=>$song->getId())).'">Delete</a>'.
+                                    ' - <a href="'.$this->url('avatar',array('action'=>'songcover','id'=>$song->getId())).'">Add/Change Song Cover</a>'.
                                     '</span><br>';
                                 }
                         	}
@@ -138,6 +140,7 @@ $this->headTitle($title);
                                 	' - <a href="'.$this->url('version',array('action'=>'add','id'=>$song->getId())).'">Add Version</a>'.
                                 	'- <a href="'.$this->url('song',array('action'=>'complete','id'=>$song->getId())).'">Finish</a>'.
                                 	' - <a href="'.$this->url('song',array('action'=>'delete','id'=>$song->getId())).'">Delete</a>'.
+                                	' - <a href="'.$this->url('avatar',array('action'=>'songcover','id'=>$song->getId())).'">Add/Change Song Cover</a>'.
                                 	'<br>';
                         	    }else{
                                 	echo '<span style="color:red;font-weight:bold"><a href="'.$this->url('song',array('action'=>'view','id'=>$song->getId())).'">'.$song->getName().
@@ -145,6 +148,7 @@ $this->headTitle($title);
                                 	' - <a href="'.$this->url('song',array('action'=>'edit','id'=>$song->getId())).'">Edit</a>'.
                                 	' - <a href="'.$this->url('version',array('action'=>'add','id'=>$song->getId())).'">Add Version</a>'.
                                 	' - <a href="'.$this->url('song',array('action'=>'delete','id'=>$song->getId())).'">Delete</a>'.
+                                	' - <a href="'.$this->url('avatar',array('action'=>'songcover','id'=>$song->getId())).'">Add/Change Song Cover</a>'.
                                     '</span><br>';
                                 }
                             }

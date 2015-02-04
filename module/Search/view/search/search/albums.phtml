@@ -54,6 +54,7 @@
 <?php if(isset($this->paginator)){?>
 <table class="table">
      <tr>
+         <th>&nbsp;</th>
          <th>Name</th>
          <th>Authors</th>
          <th>Created</th>
@@ -62,6 +63,10 @@
      </tr>
      <?php foreach ($this->paginator as $album) : // <-- change here! ?>
          <tr>
+             <td>
+                <img src="<?php echo $album->getCoverurl()?>" height="100px" width="100px"></img>
+             </td>
+             
              <td>
                 <a href="<?php echo $this->url('album',array('action'=>'view','id'=>$album->getId()));?>">
                     <?php echo $this->escapeHtml($album->getName());?>

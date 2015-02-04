@@ -13,8 +13,9 @@ $this->headTitle($title);
             <div class="panel-body">
                 <ul>
                 <?php foreach ($this->topDownloaded as $result){
-                	echo '<li><a href="'.$this->url('song',array('action'=>'view','id'=>$result[0]->getSong()->getId()))
-                	.'">'.$result[0]->getSong()->getName().'</a> - '.$result[1].'</li>';
+                    //var_dump($result->getName());
+                	echo '<li><a href="'.$this->url('song',array('action'=>'view','id'=>$result->getId()))
+                	.'">'.$result->getName().'</a></li>';
                 }?>
                 </ul>
             </div>
@@ -28,8 +29,8 @@ $this->headTitle($title);
             </div>
             <div class="panel-body">
                 <?php foreach ($this->topLiked as $result){
-                	echo '<li><a href="'.$this->url('song',array('action'=>'view','id'=>$result[0]->getSongs()->getId()))
-                	.'">'.$result[0]->getSongs()->getName().'</a> - '.$result[1].'</li>';
+                	echo '<li><a href="'.$this->url('song',array('action'=>'view','id'=>$result->getId()))
+                	.'">'.$result->getName().'</a></li>';
                 }?>
             </div>
         </div>
@@ -42,8 +43,8 @@ $this->headTitle($title);
             </div>
             <div class="panel-body">
                 <?php foreach ($this->topUnfinished as $result){
-                	echo '<li><a href="'.$this->url('song',array('action'=>'view','id'=>$result[0]->getSongs()->getId()))
-                	.'">'.$result[0]->getSongs()->getName().'</a> - '.$result[1].'</li>';
+                	echo '<li><a href="'.$this->url('song',array('action'=>'view','id'=>$result->getId()))
+                	.'">'.$result->getName().'</a></li>';
                 }?>
             </div>
         </div>

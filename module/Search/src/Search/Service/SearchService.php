@@ -19,6 +19,8 @@ class SearchService implements ServiceLocatorAwareInterface
 	const countryEntity = 'Application\Entity\Countries';
 	protected $oMService;
 	protected $genreService;
+	protected $downloadService;
+	protected $likeService;
 	/**
 	 * Set the service locator.
 	 *
@@ -153,6 +155,8 @@ class SearchService implements ServiceLocatorAwareInterface
 	    var_dump($conditions);
 	    echo $query;
 	    //*/
+	    $query.=' AND s.completed = 1 AND s.active = 1';
+        
 	    return $this->query($query,$conditions);
 	}
 	
@@ -164,6 +168,7 @@ class SearchService implements ServiceLocatorAwareInterface
 		/*echo '<br><br><br><br><br><br><br>';
 		 var_dump($conditions);
 		echo $query;*/
+		$query.=' AND a.completed = 1 AND a.active = 1';
 		return $this->query($query,$conditions);
 	}
 	
@@ -191,9 +196,11 @@ class SearchService implements ServiceLocatorAwareInterface
 			 		'mp3'=>'/uploads'.$song->getVersions()->first()->getUrl(),
 			 		'ogg'=>'/uploads'.$song->getVersions()->first()->getUrlogg());
 			}else{*/
-			$array[] = array('title'=>$song->getName(),
+		    
+		    if(sizeof($song->getVersions())>0){
+			     $array[] = array('title'=>$song->getName(),
 					'mp3'=>'/uploads'.$song->getVersions()->first()->getUrl());
-			//}
+		    }
 		}
 			
 		return $array;
@@ -201,24 +208,48 @@ class SearchService implements ServiceLocatorAwareInterface
 	
 	public function topDownloaded($num){
 		
-	    $query = 'SELECT d,count(d.song) FROM '.STATIC::downloadEntity.' d GROUP by d.song';
+	    $query = 'SELECT d.id,count(d.song) FROM '.STATIC::downloadEntity.' d WHERE d.song IS NOT NULL GROUP by d.song';
 	    
-	    return $this->query($query,array(),$num);
+	    $result = $this->query($query,array(),$num);
+	    
+	    $songs = array();
+	    foreach ($result as $dwld){
+	    	$songs[] = $this->getDownloadService()->find($dwld['id'])->getSong();
+	    }
+	    
+	    return $songs;
+	    
 	}
 	
 	public function topLiked($num){
 	
-		$query = 'Select l,count(l.songs) from '.STATIC::likeEntity
+		$query = 'Select l.id,count(l.songs) from '.STATIC::likeEntity
 		.' l where l.songs in (select s FROM '.STATIC::songEntity.' s where s.completed = 1) group by l.songs';
-		return $this->query($query,array(),$num);
+		$result = $this->query($query,array(),$num);
+		
+		$songs = array();
+		foreach ($result as $dwld){
+			$songs[] = $this->getLikeService()->find($dwld['id'])->getSongs();
+		}
+		 
+		return $songs;
+		
 	}
 	
 	public function topUnfinished($num){
 	
-		$query = 'Select l,count(l.songs) from '.STATIC::likeEntity
+		$query = 'Select l.id,count(l.songs) from '.STATIC::likeEntity
 		.' l where l.songs in (select s FROM '.STATIC::songEntity.' s where s.completed = 0) group by l.songs';
-		return $this->query($query,array(),$num);
+		$result = $this->query($query,array(),$num);
+		
+		$songs = array();
+		foreach ($result as $dwld){
+			$songs[] = $this->getLikeService()->find($dwld['id'])->getSongs();
+		}
+		 
+		return $songs;
 	}
+
 	
 	public function getEntityManager()
 	{
@@ -244,6 +275,24 @@ class SearchService implements ServiceLocatorAwareInterface
 		}
 	
 		return $this->genreService;
+	}
+	
+	private function getDownloadService()
+	{
+		if (!$this->downloadService) {
+			$this->downloadService = $this->getServiceLocator()->get('Application\Service\DownloadService');
+		}
+	
+		return $this->downloadService;
+	}
+	
+	private function getLikeService()
+	{
+		if (!$this->likeService) {
+			$this->likeService = $this->getServiceLocator()->get('Application\Service\LikeService');
+		}
+	
+		return $this->likeService;
 	}
 
 }

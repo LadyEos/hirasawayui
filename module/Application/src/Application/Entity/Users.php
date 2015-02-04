@@ -110,8 +110,7 @@ class Users implements User, ProviderInterface {
     protected $user_profile;
     
     /**
-     * @ORM\OneToOne(targetEntity="BankAccounts", inversedBy="user")
-     * @ORM\JoinColumn(name="bank_id", referencedColumnName="id")
+     * @ORM\OneToOne(targetEntity="BankAccounts", mappedBy="user")
      */
     protected $bank;
     

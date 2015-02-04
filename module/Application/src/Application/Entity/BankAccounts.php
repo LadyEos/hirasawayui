@@ -43,7 +43,8 @@ class BankAccounts {
     protected $country;
     
     /**
-     * @ORM\OneToOne(targetEntity="Users", mappedBy="bank")
+     * @ORM\OneToOne(targetEntity="Users", inversedBy="bank")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
      */
     private $user;
     

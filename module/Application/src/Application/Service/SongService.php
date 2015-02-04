@@ -164,6 +164,14 @@ class SongService implements ServiceLocatorAwareInterface{
     	return $this->songCategoriesService;
     }
     
+    public function setSongCover($song,$filename){
+    	$objectManager = $this->getOMService()->getEntityManager();
+    
+    	$this->setSong($song);
+    	$this->song->setCoverurl($filename);
+    	$objectManager->flush();
+    }
+    
     public function getEntityManager()
     {
     	if (null === $this->em) {

@@ -173,6 +173,7 @@ $(document).ready(function(){
 <?php if(isset($this->paginator)){?>
 <table class="table">
      <tr>
+         <th>&nbsp;</th>
          <th>Name</th>
          <th>Author(s)</th>
          <th>Created</th>
@@ -183,8 +184,11 @@ $(document).ready(function(){
      <?php foreach ($this->paginator as $song) : // <-- change here! ?>
          <tr>
             <td>
+                <img src="<?php echo $song->getCoverurl()?>" height="100px" width="100px"></img>
+             </td>
+            <td>
                 <a href="<?php echo $this->url('song',array('action'=>'view','id'=>$song->getId()));?>">
-                    <?php echo $this->escapeHtml($song->getName());?></td>
+                    <?php echo $this->escapeHtml($song->getName());?>
                 </a>
              <td>
                 <?php foreach($song->getUsers() as $user){

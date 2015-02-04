@@ -198,6 +198,14 @@ class AlbumService implements ServiceLocatorAwareInterface{
     	return $array;
     }
     
+    public function setAlbumCover($album,$filename){
+        $objectManager = $this->getOMService()->getEntityManager();
+        
+        $this->setAlbum($album);
+        $this->album->setCoverurl($filename);
+        $objectManager->flush();
+    }
+    
     private function getSongService()
     {
     	if (!$this->songService) {

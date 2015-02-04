@@ -26,6 +26,11 @@ class Albums {
 	protected $active;
 	
 	/**
+	 * @ORM\Column(type="string", length=300, nullable=TRUE)
+	 */
+	protected $cover_url;
+	
+	/**
 	 * @ORM\ManyToMany(targetEntity="Songs", mappedBy="albums")
 	 **/
 	protected $songs;
@@ -142,6 +147,14 @@ class Albums {
 	
 	public function setActive($active){
 		$this->active = $active;
+	}
+	
+	public function getCoverurl(){
+		return $this->cover_url;
+	}
+	
+	public function setCoverurl($cover){
+		$this->cover_url = $cover;
 	}
 	
 	/**

@@ -20,17 +20,17 @@ class AlbumFilter extends InputFilter
                 array(
                     'name' => 'StringTrim'
                 )
-            ),
+            )/*,
             'validators' => array(
                 array(
                     'name' => 'StringLength',
                     'options' => array(
                         'encoding' => 'UTF-8',
-                        'min' => 3,
+                        'min' => 0,
                         'max' => 30
                     )
                 )
-            )
+            )*/
         ));
     }
 }
